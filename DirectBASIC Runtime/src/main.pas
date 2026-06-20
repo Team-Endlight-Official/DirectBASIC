@@ -9,11 +9,11 @@ var
     aspectRatio:        single;
     w, h:               cardinal;
 
-    cube:               TFastMesh;
+    cubes:              array of TFastMesh;
     camera:             TFastCamera;
     rotX, rotY:         single;
-    posX, posY:         single;
-    camRotX, camRotY:   single;
+    posX, posY, posZ:   single;
+    camRotX, camRotY:   double;
 
 procedure PrintInfo();
 begin
@@ -40,25 +40,50 @@ end;
 procedure ControlCamera();
 begin
     if IsKeyDown(window, GLFW_KEY_W) then
-        posY := posY - 0.015
+        posZ := posZ - 0.015
     else if IsKeyDown(window, GLFW_KEY_S) then
-        posY := posY + 0.015
+        posZ := posZ + 0.015
     else
-        posY := posY + 0;
+        posZ := posZ + 0;
 
     if IsKeyDown(window, GLFW_KEY_A) then
         posX := posX - 0.015
     else if IsKeyDown(window, GLFW_KEY_D) then
         posX := posX + 0.015
     else
-        posX := posX +0;
+        posX := posX + 0;
 
-    if IsKeyDown(window, GLFW_KEY_RIGHT) then
-        camRotY := camRotY - 0.015
-    else if IsKeyDown(window, GLFW_KEY_LEFT) then
-        camRotY := camRotY + 0.015
+    if IsKeyDown(window, GLFW_KEY_E) then
+        posY := posY + 0.015
+    else if IsKeyDown(window, GLFW_KEY_Q) then
+        posY := posY - 0.015
     else
-        camRotY := camRotY + 0;
+        posY := posY + 0;
+
+    GetCursorPos(window, double(camRotY), double(camRotX));
+end;
+
+procedure CreateCubes();
+var
+    i: integer;
+begin
+    SetLength(cubes, 70);
+
+    for i := 0 to High(cubes) do
+    begin
+        cubes[i] := CreateCubeFast(TVec3.Create(Random(30) - 10, Random(10) - 5, Random(30) - 10), Vec3Zero, Vec3One);
+    end;
+end;
+
+procedure DrawCubes(texture: TTexture2DHandle);
+var
+    i: integer;
+begin
+    for i := 0 to High(cubes) do
+    begin
+        DrawFastMesh(cubes[i], texture);
+        SetRotation(cubes[i], rotX * i * 0.1, rotY * i * 0.1, 0);
+    end;
 end;
 
 begin
@@ -85,17 +110,20 @@ begin
     glCullFace(GL_FRONT);
 
     texture := LoadTexture2D('test.png');
-    cube := CreateCubeFast(TVec3.Create(0, 0, 3.5), Vec3Zero, TVec3.Create(1, 1, 1));
-    camera := CreateCameraFast(TVec3.Create(0, 0, 0), Vec3Zero, 45.0, 0.1, 100.0);
+    CreateCubes;
+    camera := CreateCameraFast(TVec3.Create(0, 0, 0), Vec3Zero, 50.0, 0.1, 100.0);
 
-    SetClearColor(0.3, 0.6, 0.9, 1.0);
+    SetClearColor(0.2, 0.5, 0.8, 1.0);
     SetViewport(0, 0, w, h);
+
+    LockCursor(window);
 
     rotX := 0;
     rotY := 0;
 
     posX := 0;
     posY := 0;
+    posZ := 0;
 
     camRotX := 0;
     camRotY := 0;
@@ -107,16 +135,13 @@ begin
         rotX := rotX + 1.25;
         rotY := rotY + 1.25;
 
-        camera.position.x := posX * 3;
-        camera.position.z := posY * 3;
-        camera.rotation.y := camRotY * 3 * 3;
-        camera.rotation.x := camRotX * 3 * 3;
+        Clamp(rotX, -90, 90);
+
+        SetCameraPosition(camera, posX * 6, posY * 3, posZ * 6);
+        SetCameraRotation(camera, -camRotX * 0.1, -camRotY * 0.1, 0);
 
         BeginFast3D(w, h, camera);
-
-        cube.rotation.x := rotX;
-        cube.rotation.y := rotY;
-        DrawFastMesh(cube, texture);
+        DrawCubes(texture);
 
         HandleInput;
         ControlCamera;

@@ -40,13 +40,22 @@ procedure EnableWireframe();
 procedure DisableWireframe();
 
 // Fast3D stuff
-procedure DrawFastMesh(mesh: TFastMesh);
-procedure DrawFastMesh(mesh: TFastMesh; texture: TTexture2DHandle);
+procedure DrawFastMesh(var mesh: TFastMesh);
+procedure DrawFastMesh(var mesh: TFastMesh; texture: TTexture2DHandle);
 procedure BeginFast3D(w, h: cardinal; fov: single; nearPlane: single; farPlane: single);
 procedure BeginFast3D(w, h: cardinal; camera: TFastCamera);
 
+procedure SetPosition(var mesh: TFastMesh; x, y, z: single);
+procedure SetRotation(var mesh: TFastMesh; x, y, z: single);
+procedure SetScale(var mesh: TFastMesh; x, y, z: single);
+
+procedure SetCameraPosition(var camera: TFastCamera; x, y, z: single);
+procedure SetCameraRotation(var camera: TFastCamera; x, y, z: single);
+
 // Return Functions
 function CreateCubeFast(pos, rot, scale: TVec3): TFastMesh;
+function CreatePyramidFast(pos, rot, scale: TVec3): TFastMesh;
+
 function CreateCameraFast(pos, rot: TVec3; fov: single; nearPlane: single; farPlane: single): TFastCamera;
 
 implementation
@@ -88,7 +97,7 @@ begin
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 end;
 
-procedure DrawFastMesh(mesh: TFastMesh);
+procedure DrawFastMesh(var mesh: TFastMesh);
 var
     i: integer;
 begin
@@ -108,9 +117,11 @@ begin
             glVertex3f(mesh.vertices[i].x, mesh.vertices[i].y, mesh.vertices[i].z);
         end;
     glEnd;
+
+    glPopMatrix;
 end;
 
-procedure DrawFastMesh(mesh: TFastMesh; texture: TTexture2DHandle);
+procedure DrawFastMesh(var mesh: TFastMesh; texture: TTexture2DHandle);
 begin
     BindTexture(texture);
     DrawFastMesh(mesh);
@@ -138,6 +149,41 @@ begin
     glRotatef(-camera.rotation.y, 0, 1, 0);
     glRotatef(-camera.rotation.z, 0, 0, 1);
     glTranslatef(-camera.position.x, -camera.position.y, -camera.position.z);
+end;
+
+procedure SetPosition(var mesh: TFastMesh; x, y, z: single);
+begin
+    mesh.position.x := x;
+    mesh.position.y := y;
+    mesh.position.z := z;
+end;
+
+procedure SetRotation(var mesh: TFastMesh; x, y, z: single);
+begin
+    mesh.rotation.x := x;
+    mesh.rotation.y := y;
+    mesh.rotation.z := z;
+end;
+
+procedure SetScale(var mesh: TFastMesh; x, y, z: single);
+begin
+    mesh.scale.x := x;
+    mesh.scale.y := y;
+    mesh.scale.z := z;
+end;
+
+procedure SetCameraPosition(var camera: TFastCamera; x, y, z: single);
+begin
+    camera.position.x := x;
+    camera.position.y := y;
+    camera.position.z := z;
+end;
+
+procedure SetCameraRotation(var camera: TFastCamera; x, y, z: single);
+begin
+    camera.rotation.x := x;
+    camera.rotation.y := y;
+    camera.rotation.z := z;
 end;
 
 // Return Functions
@@ -249,6 +295,102 @@ begin
     Result.texCoords[21] := TVec2.Create(0, 1); // Top Left
     Result.texCoords[22] := TVec2.Create(1, 1); // Top Right
     Result.texCoords[23] := TVec2.Create(1, 0); // Bottom Right
+
+    Result.position := pos;
+    Result.rotation := rot;
+    Result.scale := scale;
+end;
+
+function CreatePyramidFast(pos, rot, scale: TVec3): TFastMesh;
+begin
+    SetLength(Result.vertices, 20);
+    SetLength(Result.vertexColors, 20);
+    SetLength(Result.texCoords, 20);
+
+    // Face Bottom
+    // Vertices
+    Result.vertices[0] := TVec3.Create(0.5, -0.5, 0.5); // Front Right
+    Result.vertices[1] := TVec3.Create(0.5, -0.5, -0.5); // Back Right
+    Result.vertices[2] := TVec3.Create(-0.5, -0.5, -0.5); // Back Left
+    Result.vertices[3] := TVec3.Create(-0.5, -0.5, 0.5); // Front Left
+    // Vertex Colors
+    Result.vertexColors[0] := TVec3.Create(1, 0, 0); // Red
+    Result.vertexColors[1] := TVec3.Create(0, 1, 0); // Green
+    Result.vertexColors[2] := TVec3.Create(0, 0, 1); // Blue
+    Result.vertexColors[3] := TVec3.Create(1, 1, 0); // Yellow
+    // Texture Coordinates
+    Result.texCoords[0] := TVec2.Create(0, 0); // Bottom Left
+    Result.texCoords[1] := TVec2.Create(0, 1); // Top Left
+    Result.texCoords[2] := TVec2.Create(1, 1); // Top Right
+    Result.texCoords[3] := TVec2.Create(1, 0); // Bottom Right
+
+    // Face Front
+    // Vertices
+    Result.vertices[4] := TVec3.Create(-0.5, -0.5, 0.5); // Bottom Left
+    Result.vertices[5] := TVec3.Create(0.0, 0.5, 0.0); // Top
+    Result.vertices[6] := TVec3.Create(0.5, -0.5, 0.5); // Bottom Right
+    Result.vertices[7] := TVec3.Create(0.5, -0.5, 0.5); // Bottom Right
+    // Vertex Colors
+    Result.vertexColors[4] := TVec3.Create(1, 0, 0); // Red
+    Result.vertexColors[5] := TVec3.Create(0, 1, 0); // Green
+    Result.vertexColors[6] := TVec3.Create(0, 0, 1); // Blue
+    Result.vertexColors[7] := TVec3.Create(1, 1, 0); // Yellow
+    // Texture Coordinates
+    Result.texCoords[4] := TVec2.Create(0, 0); // Bottom Left
+    Result.texCoords[5] := TVec2.Create(0, 1); // Top Left
+    Result.texCoords[6] := TVec2.Create(1, 1); // Top Right
+    Result.texCoords[7] := TVec2.Create(1, 0); // Bottom Right
+
+    // Face Back
+    // Vertices
+    Result.vertices[8] := TVec3.Create(0.5, -0.5, -0.5); // Bottom Right
+    Result.vertices[9] := TVec3.Create(0.0, 0.5, 0.0); // Top
+    Result.vertices[10] := TVec3.Create(-0.5, -0.5, -0.5); // Bottom Left
+    Result.vertices[11] := TVec3.Create(-0.5, -0.5, -0.5); // Bottom Left
+    // Vertex Colors
+    Result.vertexColors[8] := TVec3.Create(1, 0, 0); // Red
+    Result.vertexColors[9] := TVec3.Create(0, 1, 0); // Green
+    Result.vertexColors[10] := TVec3.Create(0, 0, 1); // Blue
+    Result.vertexColors[11] := TVec3.Create(1, 1, 0); // Yellow
+    // Texture Coordinates
+    Result.texCoords[8] := TVec2.Create(0, 0); // Bottom Left
+    Result.texCoords[9] := TVec2.Create(0, 1); // Top Left
+    Result.texCoords[10] := TVec2.Create(1, 1); // Top Right
+    Result.texCoords[11] := TVec2.Create(1, 0); // Bottom Right
+
+    // Face Left
+    // Vertices
+    Result.vertices[12] := TVec3.Create(-0.5, -0.5, -0.5); // Back Left
+    Result.vertices[13] := TVec3.Create(0.0, 0.5, 0.0); // Top
+    Result.vertices[14] := TVec3.Create(-0.5, -0.5, 0.5); // Front Left
+    Result.vertices[15] := TVec3.Create(-0.5, -0.5, 0.5); // Front Left
+    // Vertex Colors
+    Result.vertexColors[12] := TVec3.Create(1, 0, 0); // Red
+    Result.vertexColors[13] := TVec3.Create(0, 1, 0); // Green
+    Result.vertexColors[14] := TVec3.Create(0, 0, 1); // Blue
+    Result.vertexColors[15] := TVec3.Create(1, 1, 0); // Yellow
+    // Texture Coordinates
+    Result.texCoords[12] := TVec2.Create(0, 0); // Bottom Left
+    Result.texCoords[13] := TVec2.Create(0, 1); // Top Left
+    Result.texCoords[14] := TVec2.Create(1, 1); // Top Right
+    Result.texCoords[15] := TVec2.Create(1, 0); // Bottom Right
+
+    // Face Right
+    // Vertices
+    Result.vertices[16] := TVec3.Create(0.5, -0.5, 0.5); // Front Right
+    Result.vertices[17] := TVec3.Create(0.0, 0.5, 0.0); // Top
+    Result.vertices[18] := TVec3.Create(0.5, -0.5, -0.5); // Back Right
+    Result.vertices[19] := TVec3.Create(0.5, -0.5, -0.5); // Back Right
+    // Vertex Colors
+    Result.vertexColors[16] := TVec3.Create(1, 0, 0); // Red
+    Result.vertexColors[17] := TVec3.Create(0, 1, 0); // Green
+    Result.vertexColors[18] := TVec3.Create(0, 0, 1); // Blue
+    Result.vertexColors[19] := TVec3.Create(1, 1, 0); // Yellow
+    // Texture Coordinates
+    Result.texCoords[16] := TVec2.Create(0, 0); // Bottom Left
+    Result.texCoords[17] := TVec2.Create(0, 1); // Top Left
+    Result.texCoords[18] := TVec2.Create(1, 1); // Top Right
+    Result.texCoords[19] := TVec2.Create(1, 0); // Bottom Right
 
     Result.position := pos;
     Result.rotation := rot;

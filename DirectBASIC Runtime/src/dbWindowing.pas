@@ -50,6 +50,8 @@ procedure SetWindowResizable(win: TWindowHandle; resizable: boolean);
 procedure SetWindowPosition(win: TWindowHandle; x, y: integer);
 procedure SetSwapInterval(interval: integer);
 procedure SetWindowVisible(win: TWindowHandle; visible: boolean);
+procedure LockCursor(win: TWindowHandle);
+procedure UnlockCursor(win: TWindowHandle);
 procedure CloseWindow(win: TWindowHandle);
 procedure PollEvents();
 
@@ -61,6 +63,7 @@ function GetWindowAspectRatio(win: TWindowHandle): single;
 
 function IsKeyDown(win: TWindowHandle; key: longInt): boolean;
 function IsKeyUp(win: TWindowHandle; key: longInt): boolean;
+procedure GetCursorPos(win: TWindowHandle; var x, y: double);
 
 implementation // Private / Implementation
 
@@ -177,6 +180,28 @@ begin
     glfwSetWindowAttrib(windows[win].winHandle, GLFW_VISIBLE, BOOL_TO_GLFWBOOL(visible));
 end;
 
+procedure LockCursor(win: TWindowHandle);
+begin
+    if win = NULL then
+    begin
+        writeln('GLFW Window you tried to lock cursor is invalid 0.');
+        exit;
+    end;
+
+    glfwSetInputMode(windows[win].winHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+end;
+
+procedure UnlockCursor(win: TWindowHandle);
+begin
+    if win = NULL then
+    begin
+        writeln('GLFW Window you tried to unlock cursor is invalid 0.');
+        exit;
+    end;
+
+    glfwSetInputMode(windows[win].winHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+end;
+
 procedure CloseWindow(win: TWindowHandle);
 begin
     if win = NULL then
@@ -253,6 +278,15 @@ end;
 function IsKeyUp(win: TWindowHandle; key: longInt): boolean;
 begin
     Result := glfwGetKey(windows[win].winHandle, key) = GLFW_RELEASE;
+end;
+
+procedure GetCursorPos(win: TWindowHandle; var x: double; var y: double);
+var
+    xPos, yPos: double;
+begin
+    glfwGetCursorPos(windows[win].winHandle, xPos, yPos);
+    x := xPos;
+    y := yPos;
 end;
 
 // Initialisation logic

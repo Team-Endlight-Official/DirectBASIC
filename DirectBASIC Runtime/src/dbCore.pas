@@ -14,6 +14,7 @@ const
 // Math Functions
 function DegToRad(deg: single): single;
 function RadToDeg(rad: single): single;
+function Clamp(value, min, max: single): single;
 
 implementation
 
@@ -25,6 +26,15 @@ end;
 function RadToDeg(rad: single): single;
 begin
     Result := rad * 180.0 / PI;
+end;
+
+function Clamp(value, min, max: single): single;
+begin
+    if value < min then
+        value := min
+    else if value > max then
+        value := max;
+    Result := value;
 end;
 
 end.
