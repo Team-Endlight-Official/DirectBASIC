@@ -5,7 +5,7 @@ unit dbFast3D;
 interface // Public
 
 uses
-    dbCore, dbMath3D, dbTexture2D, sysutils, gl, glu, glext;
+    dbCore, dbCore3D, dbMath3D, dbTexture2D, sysutils, gl, glu, glext;
 
 // Fast Mesh
 type TFastMesh = record
@@ -43,10 +43,6 @@ procedure DrawMeshFast(var mesh: TFastMesh; texture: TTexture2DHandle);
 procedure Begin3DFast(w, h: cardinal; fov: single; nearPlane: single; farPlane: single);
 procedure Begin3DFast(w, h: cardinal; camera: TFastCamera);
 procedure End3DFast();
-
-procedure Draw2DQuadFast(x, y, w, h, r, g, b, a: single; texture: TTexture2DHandle);
-procedure Begin2DFast(w, h: cardinal);
-procedure End2DFast();
 
 procedure SetPositionFast(var mesh: TFastMesh; x, y, z: single);
 procedure SetRotationFast(var mesh: TFastMesh; x, y, z: single);
@@ -173,9 +169,9 @@ end;
 
 procedure DrawMeshFast(var mesh: TFastMesh; texture: TTexture2DHandle);
 begin
-    BindTexture(texture);
+    BeginTexture2D(texture);
     DrawMeshFast(mesh);
-    BindTexture(0);
+    EndTexture2D;
 end;
 
 procedure Begin3DFast(w, h: cardinal; fov: single; nearPlane: single; farPlane: single);
@@ -203,49 +199,6 @@ end;
 
 procedure End3DFast();
 begin
-    glPopMatrix;
-end;
-
-procedure Draw2DQuadFast(x, y, w, h, r, g, b, a: single; texture: TTexture2DHandle);
-begin
-    BindTexture(texture);
-
-    glColor4f(r, g, b, a);
-    glBegin(GL_QUADS);
-
-    glTexCoord2f(1, 1); glVertex2f(x, y);
-    glTexCoord2f(0, 1); glVertex2f(x + w, y);
-    glTexCoord2f(0, 0); glVertex2f(x + w, y + h);
-    glTexCoord2f(1, 0); glVertex2f(x, y + h);
-
-    glEnd;
-
-    BindTexture(0);
-end;
-
-procedure Begin2DFast(w, h: cardinal);
-begin
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix;
-    glLoadIdentity;
-    glOrtho(0, w, h, 0, -1, 1);
-
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix;
-    glLoadIdentity;
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_FOG);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-end;
-
-procedure End2DFast();
-begin
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_FOG);
-    glDisable(GL_BLEND);
-
     glPopMatrix;
 end;
 

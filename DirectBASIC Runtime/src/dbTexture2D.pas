@@ -17,8 +17,9 @@ type TTexture2DData = record
 end;
 
 // Void Functions
-procedure BindTexture(texture: TTexture2DHandle);
-procedure DeleteTexture(texture: TTexture2DHandle);
+procedure BeginTexture2D(texture: TTexture2DHandle);
+procedure EndTexture2D();
+procedure DeleteTexture2D(texture: TTexture2DHandle);
 
 // Return Functions
 function LoadTexture2D(path: string): TTexture2DHandle;
@@ -31,15 +32,23 @@ var
     textures:       array of PTexture2DData;
 
 // Void Functions
-procedure BindTexture(texture: TTexture2DHandle);
+procedure BeginTexture2D(texture: TTexture2DHandle);
 begin
     if texture = NULL then
-        glBindTexture(GL_TEXTURE_2D, 0)
-    else
-        glBindTexture(GL_TEXTURE_2D, textures[texture]^.handle);
+    begin
+        writeln('Texture2D handle is invalid!');
+        exit;
+    end;
+
+    glBindTexture(GL_TEXTURE_2D, textures[texture]^.handle);
 end;
 
-procedure DeleteTexture(texture: TTexture2DHandle);
+procedure EndTexture2D();
+begin
+    glBindTexture(GL_TEXTURE_2D, 0);
+end;
+
+procedure DeleteTexture2D(texture: TTexture2DHandle);
 var
     path:           string;
 begin

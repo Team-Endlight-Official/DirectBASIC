@@ -127,7 +127,7 @@ begin
         //sleep(16);
     end;
 
-    DeleteTexture(texture);
+    DeleteTexture2D(texture);
 
     DestroyWindow(window);
     glfwTerminate;
