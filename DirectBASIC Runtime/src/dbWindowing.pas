@@ -15,6 +15,8 @@ type TWindowData = record
     width:          cardinal;
     height:         cardinal;
     title:          string;
+
+    isResized:      boolean;
     winHandle:      pGLFWwindow;
 end;
 
@@ -41,6 +43,10 @@ const
         glProfile:      WCI_GL_COMPAT_PROFILE;
     );
 
+// Internal Functions
+procedure glfw_error_callback(error: longInt; const description: PChar); cdecl;
+procedure glfw_window_size_callback(window: pGLFWwindow; w, h: longInt); cdecl;
+
 // Void Functions
 procedure DestroyWindow(win: TWindowHandle);
 procedure UpdateWindow(win: TWindowHandle);
@@ -60,6 +66,9 @@ function CreateWindow(w, h: cardinal; title: string): TWindowHandle;
 function CreateWindow(w, h: cardinal; title: string; wci: TWindowCreationInfo): TWindowHandle;
 function WindowShouldClose(win: TWindowHandle): boolean;
 function GetWindowAspectRatio(win: TWindowHandle): single;
+function WasWindowResized(win: TWindowHandle): boolean;
+function GetWindowWidth(win: TWindowHandle): cardinal;
+function GetWindowHeight(win: TWindowHandle): cardinal;
 
 function IsKeyDown(win: TWindowHandle; key: longInt): boolean;
 function IsKeyUp(win: TWindowHandle; key: longInt): boolean;
@@ -67,8 +76,10 @@ procedure GetCursorPos(win: TWindowHandle; var x, y: double);
 
 implementation // Private / Implementation
 
+type PWindowData = ^TWindowData;
+
 var
-    windows:        array of TWindowData;
+    windows:        array of PWindowData;
 
 
 // INTERNAL PRIVATE GLFW FUNCTIONS
@@ -88,6 +99,19 @@ begin
     writeln('GLFW Error: ' + description);
 end;
 
+procedure glfw_window_size_callback(window: pGLFWwindow; w, h: longInt); cdecl;
+var
+    data: PWindowData;
+begin
+    data := PWindowData(glfwGetWindowUserPointer(window));
+
+    if data = nil then
+        exit;
+
+    data^.width := w;
+    data^.height := h;
+    data^.isResized := true;
+end;
 
 procedure DestroyWindow(win: TWindowHandle);
 begin
@@ -97,13 +121,13 @@ begin
         exit;
     end;
 
-    glfwDestroyWindow(windows[win].winHandle);
+    glfwDestroyWindow(windows[win]^.winHandle);
     writeln('GLFW Window has been destroyed!');
 
-    windows[win].winHandle := nil;
-    windows[win].width := 0;
-    windows[win].height := 0;
-    windows[win].title := '';
+    windows[win]^.winHandle := nil;
+    windows[win]^.width := 0;
+    windows[win]^.height := 0;
+    windows[win]^.title := '';
 
     win := NULL;
 end;
@@ -116,7 +140,7 @@ begin
         exit;
     end;
 
-    glfwSwapBuffers(windows[win].winHandle);
+    glfwSwapBuffers(windows[win]^.winHandle);
 end;
 
 procedure MakeContextCurrent(win: TWindowHandle);
@@ -127,7 +151,7 @@ begin
         exit;
     end;
 
-    glfwMakeContextCurrent(windows[win].winHandle);
+    glfwMakeContextCurrent(windows[win]^.winHandle);
 end;
 
 procedure SetWindowTitle(win: TWindowHandle; title: string);
@@ -138,8 +162,8 @@ begin
         exit;
     end;
 
-    windows[win].title := title;
-    glfwSetWindowTitle(windows[win].winHandle, PChar(windows[win].title));
+    windows[win]^.title := title;
+    glfwSetWindowTitle(windows[win]^.winHandle, PChar(windows[win]^.title));
 end;
 
 procedure SetWindowResizable(win: TWindowHandle; resizable: boolean);
@@ -150,7 +174,7 @@ begin
         exit;
     end;
 
-    glfwSetWindowAttrib(windows[win].winHandle, GLFW_RESIZABLE, BOOL_TO_GLFWBOOL(resizable));
+    glfwSetWindowAttrib(windows[win]^.winHandle, GLFW_RESIZABLE, BOOL_TO_GLFWBOOL(resizable));
 end;
 
 procedure SetWindowPosition(win: TWindowHandle; x, y: integer);
@@ -161,7 +185,7 @@ begin
         exit;
     end;
 
-    glfwSetWindowPos(windows[win].winHandle, x, y);
+    glfwSetWindowPos(windows[win]^.winHandle, x, y);
 end;
 
 procedure SetSwapInterval(interval: integer);
@@ -177,7 +201,7 @@ begin
         exit;
     end;
 
-    glfwSetWindowAttrib(windows[win].winHandle, GLFW_VISIBLE, BOOL_TO_GLFWBOOL(visible));
+    glfwSetWindowAttrib(windows[win]^.winHandle, GLFW_VISIBLE, BOOL_TO_GLFWBOOL(visible));
 end;
 
 procedure LockCursor(win: TWindowHandle);
@@ -188,7 +212,7 @@ begin
         exit;
     end;
 
-    glfwSetInputMode(windows[win].winHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(windows[win]^.winHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 end;
 
 procedure UnlockCursor(win: TWindowHandle);
@@ -199,7 +223,7 @@ begin
         exit;
     end;
 
-    glfwSetInputMode(windows[win].winHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(windows[win]^.winHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 end;
 
 procedure CloseWindow(win: TWindowHandle);
@@ -210,7 +234,7 @@ begin
         exit;
     end;
 
-    glfwSetWindowShouldClose(windows[win].winHandle, GLFW_TRUE);
+    glfwSetWindowShouldClose(windows[win]^.winHandle, GLFW_TRUE);
 end;
 
 procedure PollEvents();
@@ -226,18 +250,23 @@ begin
     id := Length(windows);
     SetLength(windows, id + 1);
 
-    windows[id].width :=    w;
-    windows[id].height :=   h;
-    windows[id].title :=    title;
+    New(windows[id]);
 
-    windows[id].winHandle := glfwCreateWindow(windows[id].width, windows[id].height, PChar(windows[id].title), nil, nil);
-    if windows[id].winHandle = nil then
+    windows[id]^.width :=    w;
+    windows[id]^.height :=   h;
+    windows[id]^.title :=    title;
+    windows[id]^.isResized := false;
+
+    windows[id]^.winHandle := glfwCreateWindow(windows[id]^.width, windows[id]^.height, PChar(windows[id]^.title), nil, nil);
+    if windows[id]^.winHandle = nil then
     begin
         glfwTerminate;
         writeln('GLFW Window could not be created!');
         halt(1);
     end;
+    glfwSetWindowUserPointer(windows[id]^.winHandle, windows[id]);
 
+    glfwSetWindowSizeCallback(windows[id]^.winHandle, @glfw_window_size_callback);
     writeln('GLFW Window has been created successfully!');
     Result := id;
 end;
@@ -256,7 +285,7 @@ end;
 
 function WindowShouldClose(win: TWindowHandle): boolean;
 begin
-    Result := glfwWindowShouldClose(windows[win].winHandle) = GLFW_TRUE;
+    Result := glfwWindowShouldClose(windows[win]^.winHandle) = GLFW_TRUE;
 end;
 
 function GetWindowAspectRatio(win: TWindowHandle): single;
@@ -267,24 +296,59 @@ begin
         exit;
     end;
 
-    Result := single(windows[win].width) / single(windows[win].height);
+    Result := single(windows[win]^.width) / single(windows[win]^.height);
+end;
+
+function WasWindowResized(win: TWindowHandle): boolean;
+begin
+    if win = NULL then
+    begin
+        writeln('GLFW Window you tried to check resize status from is invalid 0.');
+        Result := false;
+        exit;
+    end;
+
+    Result := windows[win]^.isResized;
+    windows[win]^.isResized := false;
+end;
+
+function GetWindowWidth(win: TWindowHandle): cardinal;
+begin
+    if win = NULL then
+    begin
+        writeln('GLFW Window you tried to get width from is invalid 0.');
+        exit;
+    end;
+
+    Result := windows[win]^.width;
+end;
+
+function GetWindowHeight(win: TWindowHandle): cardinal;
+begin
+    if win = NULL then
+    begin
+        writeln('GLFW Window you tried to get height from is invalid 0.');
+        exit;
+    end;
+
+    Result := windows[win]^.height;
 end;
 
 function IsKeyDown(win: TWindowHandle; key: longInt): boolean;
 begin
-    Result := glfwGetKey(windows[win].winHandle, key) = GLFW_PRESS;
+    Result := glfwGetKey(windows[win]^.winHandle, key) = GLFW_PRESS;
 end;
 
 function IsKeyUp(win: TWindowHandle; key: longInt): boolean;
 begin
-    Result := glfwGetKey(windows[win].winHandle, key) = GLFW_RELEASE;
+    Result := glfwGetKey(windows[win]^.winHandle, key) = GLFW_RELEASE;
 end;
 
 procedure GetCursorPos(win: TWindowHandle; var x: double; var y: double);
 var
     xPos, yPos: double;
 begin
-    glfwGetCursorPos(windows[win].winHandle, xPos, yPos);
+    glfwGetCursorPos(windows[win]^.winHandle, xPos, yPos);
     x := xPos;
     y := yPos;
 end;

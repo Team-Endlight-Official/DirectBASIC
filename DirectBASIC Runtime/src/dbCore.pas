@@ -15,6 +15,7 @@ const
 function DegToRad(deg: single): single;
 function RadToDeg(rad: single): single;
 function Clamp(value, min, max: single): single;
+procedure Clamp(var value: single; min, max: single);
 
 implementation
 
@@ -35,6 +36,14 @@ begin
     else if value > max then
         value := max;
     Result := value;
+end;
+
+procedure Clamp(var value: single; min, max: single);
+begin
+    if value < min then
+        value := min
+    else if value > max then
+        value := max;
 end;
 
 end.

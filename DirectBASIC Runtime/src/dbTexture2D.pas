@@ -13,6 +13,7 @@ type TTexture2DData = record
     width:          cardinal;
     height:         cardinal;
     handle:         GLuint;
+    path:           string;
 end;
 
 // Void Functions
@@ -24,8 +25,10 @@ function LoadTexture2D(path: string): TTexture2DHandle;
 
 implementation
 
+type PTexture2DData = ^TTexture2DData;
+
 var
-    textures:       array of TTexture2DData;
+    textures:       array of PTexture2DData;
 
 // Void Functions
 procedure BindTexture(texture: TTexture2DHandle);
@@ -33,10 +36,12 @@ begin
     if texture = NULL then
         glBindTexture(GL_TEXTURE_2D, 0)
     else
-        glBindTexture(GL_TEXTURE_2D, textures[texture].handle);
+        glBindTexture(GL_TEXTURE_2D, textures[texture]^.handle);
 end;
 
 procedure DeleteTexture(texture: TTexture2DHandle);
+var
+    path:           string;
 begin
     if texture = NULL then
     begin
@@ -44,14 +49,17 @@ begin
         exit;
     end;
 
-    glDeleteTextures(1, @textures[texture].handle);
+    path := textures[texture]^.path;
 
-    textures[texture].width := 0;
-    textures[texture].height := 0;
-    textures[texture].handle := 0;
+    glDeleteTextures(1, @textures[texture]^.handle);
+
+    textures[texture]^.width := 0;
+    textures[texture]^.height := 0;
+    textures[texture]^.handle := 0;
+    textures[texture]^.path := '';
 
     texture := NULL;
-    writeln('Texture 2D has been deleted!');
+    writeln('Texture 2D: ' + path + ' has been deleted!');
 end;
 
 // Return Functions
@@ -76,6 +84,8 @@ begin
 
     id := Length(textures);
     SetLength(textures, id + 1);
+
+    New(textures[id]);
 
     img := TFPMemoryImage.Create(0, 0);
     img.LoadFromFile(path, reader);
@@ -105,13 +115,13 @@ begin
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMG.Width, IMG.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, @PIXELDATA[0]);
 
-    textures[id].width  :=       img.Width;
-    textures[id].height :=       img.Height;
-    textures[id].handle :=       handle;
-
+    textures[id]^.width  :=       img.Width;
+    textures[id]^.height :=       img.Height;
+    textures[id]^.handle :=       handle;
+    textures[id]^.path :=         path;
     img.Free;
 
-    writeln('Texture 2D has been loaded successfully!');
+    writeln('Texture 2D: ' + path + ' has been loaded successfully!');
     Result := id;
 end;
 

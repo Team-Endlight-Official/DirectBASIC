@@ -28,29 +28,32 @@ type TFastCamera = record
 end;
 
 // Void Functions
-procedure PrintGLInfo();
-
-// Core GL Stuff
-procedure SetViewport(x, y, w, h: integer);
-procedure SetClearColor(r, g, b, a: single);
-procedure SetClearMask(mask: longInt);
-
-// Debug stuff
-procedure EnableWireframe();
-procedure DisableWireframe();
 
 // Fast3D stuff
-procedure DrawFastMesh(var mesh: TFastMesh);
-procedure DrawFastMesh(var mesh: TFastMesh; texture: TTexture2DHandle);
-procedure BeginFast3D(w, h: cardinal; fov: single; nearPlane: single; farPlane: single);
-procedure BeginFast3D(w, h: cardinal; camera: TFastCamera);
+procedure SetFogModeFast(mode: GLenum);
+procedure SetFogColorFast(r, g, b, a: single);
+procedure SetFogDensityFast(density: single);
+procedure SetFogStartEndFast(start, &end: single);
 
-procedure SetPosition(var mesh: TFastMesh; x, y, z: single);
-procedure SetRotation(var mesh: TFastMesh; x, y, z: single);
-procedure SetScale(var mesh: TFastMesh; x, y, z: single);
+procedure SetMaterialSpecularFast(face: cardinal; r, g, b, a: single);
+procedure SetMaterialShininessFast(face: cardinal; shininess: single);
 
-procedure SetCameraPosition(var camera: TFastCamera; x, y, z: single);
-procedure SetCameraRotation(var camera: TFastCamera; x, y, z: single);
+procedure DrawMeshFast(var mesh: TFastMesh);
+procedure DrawMeshFast(var mesh: TFastMesh; texture: TTexture2DHandle);
+procedure Begin3DFast(w, h: cardinal; fov: single; nearPlane: single; farPlane: single);
+procedure Begin3DFast(w, h: cardinal; camera: TFastCamera);
+procedure End3DFast();
+
+procedure Draw2DQuadFast(x, y, w, h, r, g, b, a: single; texture: TTexture2DHandle);
+procedure Begin2DFast(w, h: cardinal);
+procedure End2DFast();
+
+procedure SetPositionFast(var mesh: TFastMesh; x, y, z: single);
+procedure SetRotationFast(var mesh: TFastMesh; x, y, z: single);
+procedure SetScaleFast(var mesh: TFastMesh; x, y, z: single);
+
+procedure SetCameraPositionFast(var camera: TFastCamera; x, y, z: single);
+procedure SetCameraRotationFast(var camera: TFastCamera; x, y, z: single);
 
 // Return Functions
 function CreateCubeFast(pos, rot, scale: TVec3): TFastMesh;
@@ -61,43 +64,90 @@ function CreateCameraFast(pos, rot: TVec3; fov: single; nearPlane: single; farPl
 implementation
 
 // Void Functions
-procedure PrintGLInfo();
+procedure SetFogModeFast(mode: cardinal);
 begin
-    writeln('GL Vendor: ' + PChar(glGetString(GL_VENDOR)));
-    writeln('GL Renderer: ' + PChar(glGetString(GL_RENDERER)));
-    writeln('GL Version: ' + PChar(glGetString(GL_VERSION)));
-    writeln('GL GLSL Version: ' + PChar(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+    case mode of
+    0: begin
+        mode := GL_LINEAR;
+    end;
+    1: begin
+        mode := GL_EXP;
+    end;
+    2: begin
+        mode := GL_EXP2;
+    end;
+    else
+        writeln('Invalid fog mode! Defaulting to GL_LINEAR.');
+        mode := GL_LINEAR;
+    end;
+
+    glFogi(GL_FOG_MODE, mode);
 end;
 
-procedure SetViewport(x, y, w, h: integer);
+procedure SetFogColorFast(r, g, b, a: single);
+var
+    color: array[0..3] of single;
 begin
-    glViewport(x, y, w, h);
+    color[0] := r;
+    color[1] := g;  
+    color[2] := b;
+    color[3] := a;
+    glFogfv(GL_FOG_COLOR, color);
 end;
 
-procedure SetClearColor(r, g, b, a: single);
+procedure SetFogDensityFast(density: single);
 begin
-    glClearColor(r, g, b, a);
+    glFogf(GL_FOG_DENSITY, density);
 end;
 
-procedure SetClearMask(mask: longInt);
+procedure SetFogStartEndFast(start, &end: single);
 begin
-    glClear(mask);
+    glFogf(GL_FOG_START, start);
+    glFogf(GL_FOG_END, &end);
 end;
 
-procedure EnableWireframe();
+procedure SetMaterialSpecularFast(face: cardinal; r, g, b, a: single);
+var
+    specular: array[0..3] of single;
 begin
-    glDisable(GL_TEXTURE_2D);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glLineWidth(1.25);
+    specular[0] := r;
+    specular[1] := g;
+    specular[2] := b;
+    specular[3] := a;
+
+    case face of
+    0: begin
+        face := GL_FRONT;
+    end;
+    1: begin
+        face := GL_BACK;
+    end;
+    else
+        writeln('Invalid face! Defaulting to GL_FRONT.');
+        face := GL_FRONT;
+    end;
+
+    glMaterialfv(face, GL_SPECULAR, specular);
 end;
 
-procedure DisableWireframe();
+procedure SetMaterialShininessFast(face: cardinal; shininess: single);
 begin
-    glEnable(GL_TEXTURE_2D);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    case face of
+    0: begin
+        face := GL_FRONT;
+    end;
+    1: begin
+        face := GL_BACK;
+    end;
+    else
+        writeln('Invalid face! Defaulting to GL_FRONT.');
+        face := GL_FRONT;
+    end;
+
+    glMaterialf(face, GL_SHININESS, shininess);
 end;
 
-procedure DrawFastMesh(var mesh: TFastMesh);
+procedure DrawMeshFast(var mesh: TFastMesh);
 var
     i: integer;
 begin
@@ -121,14 +171,14 @@ begin
     glPopMatrix;
 end;
 
-procedure DrawFastMesh(var mesh: TFastMesh; texture: TTexture2DHandle);
+procedure DrawMeshFast(var mesh: TFastMesh; texture: TTexture2DHandle);
 begin
     BindTexture(texture);
-    DrawFastMesh(mesh);
+    DrawMeshFast(mesh);
     BindTexture(0);
 end;
 
-procedure BeginFast3D(w, h: cardinal; fov: single; nearPlane: single; farPlane: single);
+procedure Begin3DFast(w, h: cardinal; fov: single; nearPlane: single; farPlane: single);
 begin
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity;
@@ -137,7 +187,7 @@ begin
     glMatrixMode(GL_MODELVIEW);
 end;
 
-procedure BeginFast3D(w, h: cardinal; camera: TFastCamera);
+procedure Begin3DFast(w, h: cardinal; camera: TFastCamera);
 begin
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity;
@@ -151,35 +201,83 @@ begin
     glTranslatef(-camera.position.x, -camera.position.y, -camera.position.z);
 end;
 
-procedure SetPosition(var mesh: TFastMesh; x, y, z: single);
+procedure End3DFast();
+begin
+    glPopMatrix;
+end;
+
+procedure Draw2DQuadFast(x, y, w, h, r, g, b, a: single; texture: TTexture2DHandle);
+begin
+    BindTexture(texture);
+
+    glColor4f(r, g, b, a);
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(1, 1); glVertex2f(x, y);
+    glTexCoord2f(0, 1); glVertex2f(x + w, y);
+    glTexCoord2f(0, 0); glVertex2f(x + w, y + h);
+    glTexCoord2f(1, 0); glVertex2f(x, y + h);
+
+    glEnd;
+
+    BindTexture(0);
+end;
+
+procedure Begin2DFast(w, h: cardinal);
+begin
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix;
+    glLoadIdentity;
+    glOrtho(0, w, h, 0, -1, 1);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix;
+    glLoadIdentity;
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_FOG);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+end;
+
+procedure End2DFast();
+begin
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FOG);
+    glDisable(GL_BLEND);
+
+    glPopMatrix;
+end;
+
+procedure SetPositionFast(var mesh: TFastMesh; x, y, z: single);
 begin
     mesh.position.x := x;
     mesh.position.y := y;
     mesh.position.z := z;
 end;
 
-procedure SetRotation(var mesh: TFastMesh; x, y, z: single);
+procedure SetRotationFast(var mesh: TFastMesh; x, y, z: single);
 begin
     mesh.rotation.x := x;
     mesh.rotation.y := y;
     mesh.rotation.z := z;
 end;
 
-procedure SetScale(var mesh: TFastMesh; x, y, z: single);
+procedure SetScaleFast(var mesh: TFastMesh; x, y, z: single);
 begin
     mesh.scale.x := x;
     mesh.scale.y := y;
     mesh.scale.z := z;
 end;
 
-procedure SetCameraPosition(var camera: TFastCamera; x, y, z: single);
+procedure SetCameraPositionFast(var camera: TFastCamera; x, y, z: single);
 begin
     camera.position.x := x;
     camera.position.y := y;
     camera.position.z := z;
 end;
 
-procedure SetCameraRotation(var camera: TFastCamera; x, y, z: single);
+procedure SetCameraRotationFast(var camera: TFastCamera; x, y, z: single);
 begin
     camera.rotation.x := x;
     camera.rotation.y := y;

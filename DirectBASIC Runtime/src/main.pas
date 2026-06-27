@@ -1,7 +1,7 @@
 program main;
 
 uses
-    dbCore, dbMath3D, dbWindowing, dbFast3D, dbTexture2D, gl, glu, glfw, sysutils;
+    dbCore, dbMath3D, dbWindowing, dbCore3D, dbFast3D, dbTexture2D, gl, glu, glfw, sysutils;
 
 var
     window:             TWindowHandle;
@@ -9,19 +9,20 @@ var
     aspectRatio:        single;
     w, h:               cardinal;
 
-    cubes:              array of TFastMesh;
+    cube:               TFastMesh;
     camera:             TFastCamera;
     rotX, rotY:         single;
-    posX, posY, posZ:   single;
-    camRotX, camRotY:   double;
+    posX, posY:         single;
 
 procedure PrintInfo();
 begin
     writeln('Controls:');
     writeln('  W/S: Move Up/Down');
     writeln('  A/D: Move Left/Right');
+    writeln('  Q/E: Move Down/Up');
     writeln('  F1: Enable Wireframe');
     writeln('  F2: Disable Wireframe');
+    writeln('  ESC: Close Window');
 end;
 
 procedure HandleInput();
@@ -39,13 +40,6 @@ end;
 
 procedure ControlCamera();
 begin
-    if IsKeyDown(window, GLFW_KEY_W) then
-        posZ := posZ - 0.015
-    else if IsKeyDown(window, GLFW_KEY_S) then
-        posZ := posZ + 0.015
-    else
-        posZ := posZ + 0;
-
     if IsKeyDown(window, GLFW_KEY_A) then
         posX := posX - 0.015
     else if IsKeyDown(window, GLFW_KEY_D) then
@@ -53,37 +47,12 @@ begin
     else
         posX := posX + 0;
 
-    if IsKeyDown(window, GLFW_KEY_E) then
+    if IsKeyDown(window, GLFW_KEY_W) then
         posY := posY + 0.015
-    else if IsKeyDown(window, GLFW_KEY_Q) then
+    else if IsKeyDown(window, GLFW_KEY_S) then
         posY := posY - 0.015
     else
         posY := posY + 0;
-
-    GetCursorPos(window, double(camRotY), double(camRotX));
-end;
-
-procedure CreateCubes();
-var
-    i: integer;
-begin
-    SetLength(cubes, 70);
-
-    for i := 0 to High(cubes) do
-    begin
-        cubes[i] := CreateCubeFast(TVec3.Create(Random(30) - 10, Random(10) - 5, Random(30) - 10), Vec3Zero, Vec3One);
-    end;
-end;
-
-procedure DrawCubes(texture: TTexture2DHandle);
-var
-    i: integer;
-begin
-    for i := 0 to High(cubes) do
-    begin
-        DrawFastMesh(cubes[i], texture);
-        SetRotation(cubes[i], rotX * i * 0.1, rotY * i * 0.1, 0);
-    end;
 end;
 
 begin
@@ -97,36 +66,32 @@ begin
     window := CreateWindow(w, h, 'Title!', WCI_330);
     
     MakeContextCurrent(window);
-    SetWindowResizable(window, false);
+    SetWindowResizable(window, true);
 
     SetSwapInterval(1); // Enable V-Sync
 
     PrintGLInfo;
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_CULL_FACE);
+    EnableDepthTest;
+    SetDepthFunc(0);
+    EnableTexture2D;
+    EnableCullFace;
     glCullFace(GL_FRONT);
+    EnableLighting;
 
     texture := LoadTexture2D('test.png');
-    CreateCubes;
+
     camera := CreateCameraFast(TVec3.Create(0, 0, 0), Vec3Zero, 50.0, 0.1, 100.0);
+    cube := CreateCubeFast(TVec3.Create(0, 0, 4), Vec3Zero, Vec3One);
 
-    SetClearColor(0.2, 0.5, 0.8, 1.0);
+    SetClearColor(0.3, 0.6, 0.9, 1.0);
     SetViewport(0, 0, w, h);
-
-    LockCursor(window);
 
     rotX := 0;
     rotY := 0;
 
     posX := 0;
     posY := 0;
-    posZ := 0;
-
-    camRotX := 0;
-    camRotY := 0;
 
     while WindowShouldClose(window) = false do
     begin
@@ -135,13 +100,24 @@ begin
         rotX := rotX + 1.25;
         rotY := rotY + 1.25;
 
-        Clamp(rotX, -90, 90);
+        // Callback converted to if statement :D
+        if WasWindowResized(window) then
+        begin
+            w := GetWindowWidth(window);
+            h := GetWindowHeight(window);
+            aspectRatio := single(w) / single(h);
+            SetViewport(0, 0, w, h);
+        end;
 
-        SetCameraPosition(camera, posX * 6, posY * 3, posZ * 6);
-        SetCameraRotation(camera, -camRotX * 0.1, -camRotY * 0.1, 0);
+        Begin3DFast(w, h, camera);
 
-        BeginFast3D(w, h, camera);
-        DrawCubes(texture);
+        SetMaterialSpecularFast(0, 0.5, 0.8, 1.0, 1.0);
+        SetMaterialShininessFast(0, 32.0);
+        DrawMeshFast(cube, texture);      
+        SetRotationFast(cube, rotX, rotY, 0);
+        SetPositionFast(cube, posX, posY, 4);
+
+        End3DFast;
 
         HandleInput;
         ControlCamera;
@@ -152,6 +128,7 @@ begin
     end;
 
     DeleteTexture(texture);
+
     DestroyWindow(window);
     glfwTerminate;
     writeln('GLFW has been terminated!');
