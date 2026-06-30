@@ -5,7 +5,7 @@ unit dbTexture2D;
 interface // Public
 
 uses
-    sysutils, gl, glu, glext, dbCore, FPimage, FPReadPNG, FPReadBMP;
+    sysutils, dglOpenGL, dbCore, FPimage, FPReadPNG, FPReadBMP;
 
 type TTexture2DHandle = cardinal;
 
@@ -15,6 +15,10 @@ type TTexture2DData = record
     handle:         GLuint;
     path:           string;
 end;
+
+// Internal
+procedure db_texture2d_init_internal();
+
 
 // Void Functions
 procedure BeginTexture2D(texture: TTexture2DHandle);
@@ -31,10 +35,22 @@ type PTexture2DData = ^TTexture2DData;
 var
     textures:       array of PTexture2DData;
 
+// Internal
+procedure db_texture2d_init_internal();
+begin
+    SetLength(textures, 1);
+    writeln('Texture 2D module has been loaded!');
+end;
+
+function IS_TEXTURE_2D_VALID(texture: TTexture2DHandle): boolean; // Internal check! might become user accessible!
+begin
+    Result := (texture < Length(textures)) or (textures[texture] <> nil);
+end;
+
 // Void Functions
 procedure BeginTexture2D(texture: TTexture2DHandle);
 begin
-    if texture = NULL then
+    if not IS_TEXTURE_2D_VALID(texture) then
     begin
         writeln('Texture2D handle is invalid!');
         exit;
@@ -67,7 +83,9 @@ begin
     textures[texture]^.handle := 0;
     textures[texture]^.path := '';
 
-    texture := NULL;
+    Dispose(textures[texture]);
+    textures[texture] := nil;
+
     writeln('Texture 2D: ' + path + ' has been deleted!');
 end;
 
@@ -119,22 +137,22 @@ begin
     glGenTextures(1, @handle);
     glBindTexture(GL_TEXTURE_2D, handle);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, IMG.Width, IMG.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, @PIXELDATA[0]);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
 
     textures[id]^.width  :=       img.Width;
     textures[id]^.height :=       img.Height;
     textures[id]^.handle :=       handle;
     textures[id]^.path :=         path;
     img.Free;
+    glBindTexture(GL_TEXTURE_2D, NULL);
 
     writeln('Texture 2D: ' + path + ' has been loaded successfully!');
     Result := id;
 end;
 
-initialization
-    SetLength(textures, 1);
-    writeln('Texture 2D module loaded!');
 end.

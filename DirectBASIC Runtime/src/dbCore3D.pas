@@ -5,9 +5,11 @@ unit dbCore3D;
 interface
 
 uses
-    dbCore, dbMath3D, dbTexture2D, sysutils, gl, glu, glext;
+    dbCore, dbMath3D, dbTexture2D, sysutils, dglOpenGL;
 
 // Void Functions
+procedure Initialize3D();
+
 procedure PrintGLInfo();
 
 // Core GL Stuff
@@ -19,6 +21,7 @@ procedure EnableFog();
 procedure DisableFog();
 
 procedure EnableCullFace();
+procedure SetCullFace(face: cardinal);
 procedure DisableCullFace();
 
 procedure EnableDepthTest();
@@ -36,6 +39,18 @@ procedure EnableWireframe();
 procedure DisableWireframe();
 
 implementation
+
+procedure Initialize3D();
+begin
+    if not InitOpenGL then
+    begin
+        writeln('Failed to initialize dglOpenGL!');
+        halt(1);
+    end;
+
+    ReadExtensions;
+    ReadImplementationProperties;
+end;
 
 procedure PrintGLInfo();
 begin
@@ -74,6 +89,23 @@ end;
 procedure EnableCullFace();
 begin
     glEnable(GL_CULL_FACE);
+end;
+
+procedure SetCullFace(face: cardinal);
+begin
+    case face of
+    0: begin
+        face := GL_FRONT;
+    end;
+    1: begin
+        face := GL_BACK;
+    end;
+    else
+        writeln('Invalid cull face! Defaulting to GL_FRONT.');
+        face := GL_FRONT;
+    end;
+
+    glCullFace(face);
 end;
 
 procedure DisableCullFace();

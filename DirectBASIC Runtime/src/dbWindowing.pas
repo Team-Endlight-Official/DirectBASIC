@@ -34,7 +34,7 @@ const
     WCI_GL_COMPAT_PROFILE = GLFW_OPENGL_COMPAT_PROFILE;
     WCI_GL_ANY_PROFILE = GLFW_OPENGL_ANY_PROFILE;
 
-    WCI_330: TWindowCreationInfo = (
+    WCI_COMPAT: TWindowCreationInfo = (
         resizable:      true;
         visible:        true;
         forwardCompat:  true;
@@ -43,9 +43,20 @@ const
         glProfile:      WCI_GL_COMPAT_PROFILE;
     );
 
+    WCI_330: TWindowCreationInfo = (
+        resizable:      true;
+        visible:        true;
+        forwardCompat:  false;
+        glMajorVersion: 3;
+        glMinorVersion: 3;
+        glProfile:      WCI_GL_CORE_PROFILE;
+    );
+
 // Internal Functions
 procedure glfw_error_callback(error: longInt; const description: PChar); cdecl;
 procedure glfw_window_size_callback(window: pGLFWwindow; w, h: longInt); cdecl;
+
+procedure db_windowing_init_internal();
 
 // Void Functions
 procedure DestroyWindow(win: TWindowHandle);
@@ -54,7 +65,8 @@ procedure MakeContextCurrent(win: TWindowHandle);
 procedure SetWindowTitle(win: TWindowHandle; title: string);
 procedure SetWindowResizable(win: TWindowHandle; resizable: boolean);
 procedure SetWindowPosition(win: TWindowHandle; x, y: integer);
-procedure SetSwapInterval(interval: integer);
+procedure EnableVSync();
+procedure DisableVSync();
 procedure SetWindowVisible(win: TWindowHandle; visible: boolean);
 procedure LockCursor(win: TWindowHandle);
 procedure UnlockCursor(win: TWindowHandle);
@@ -113,9 +125,28 @@ begin
     data^.isResized := true;
 end;
 
+procedure db_windowing_init_internal();
+begin
+    glfwSetErrorCallback(@glfw_error_callback);
+
+    if glfwInit = GLFW_FALSE then
+    begin
+        writeln('GLFW could not be initialized!');
+        halt(1);
+    end;
+
+    SetLength(windows, 1);
+    writeln('Windowing module has been initialized!');
+end;
+
+function IS_WINDOW_VALID(window: TWindowHandle): boolean;
+begin
+    Result := (window < Length(windows)) or (windows[window] <> nil);
+end;
+
 procedure DestroyWindow(win: TWindowHandle);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to destroy is invalid 0.');
         exit;
@@ -129,12 +160,13 @@ begin
     windows[win]^.height := 0;
     windows[win]^.title := '';
 
-    win := NULL;
+    Dispose(windows[win]);
+    windows[win] := nil;
 end;
 
 procedure UpdateWindow(win: TWindowHandle);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to update is invalid 0.');
         exit;
@@ -145,7 +177,7 @@ end;
 
 procedure MakeContextCurrent(win: TWindowHandle);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to make context current is invalid 0.');
         exit;
@@ -156,7 +188,7 @@ end;
 
 procedure SetWindowTitle(win: TWindowHandle; title: string);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to set title is invalid 0.');
         exit;
@@ -168,7 +200,7 @@ end;
 
 procedure SetWindowResizable(win: TWindowHandle; resizable: boolean);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to set resizable attrib is invalid 0.');
         exit;
@@ -179,7 +211,7 @@ end;
 
 procedure SetWindowPosition(win: TWindowHandle; x, y: integer);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to set position is invalid 0.');
         exit;
@@ -188,14 +220,19 @@ begin
     glfwSetWindowPos(windows[win]^.winHandle, x, y);
 end;
 
-procedure SetSwapInterval(interval: integer);
+procedure EnableVSync();
 begin
-    glfwSwapInterval(interval);
+    glfwSwapInterval(1);
+end;
+
+procedure DisableVSync();
+begin
+    glfwSwapInterval(0);
 end;
 
 procedure SetWindowVisible(win: TWindowHandle; visible: boolean);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to set visible is invalid 0.');
         exit;
@@ -206,7 +243,7 @@ end;
 
 procedure LockCursor(win: TWindowHandle);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to lock cursor is invalid 0.');
         exit;
@@ -217,7 +254,7 @@ end;
 
 procedure UnlockCursor(win: TWindowHandle);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to unlock cursor is invalid 0.');
         exit;
@@ -228,7 +265,7 @@ end;
 
 procedure CloseWindow(win: TWindowHandle);
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to close is invalid 0.');
         exit;
@@ -290,7 +327,7 @@ end;
 
 function GetWindowAspectRatio(win: TWindowHandle): single;
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to get aspect ration from is invalid 0.');
         exit;
@@ -301,7 +338,7 @@ end;
 
 function WasWindowResized(win: TWindowHandle): boolean;
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to check resize status from is invalid 0.');
         Result := false;
@@ -314,7 +351,7 @@ end;
 
 function GetWindowWidth(win: TWindowHandle): cardinal;
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to get width from is invalid 0.');
         exit;
@@ -325,7 +362,7 @@ end;
 
 function GetWindowHeight(win: TWindowHandle): cardinal;
 begin
-    if win = NULL then
+    if not IS_WINDOW_VALID(win) then
     begin
         writeln('GLFW Window you tried to get height from is invalid 0.');
         exit;
@@ -353,16 +390,4 @@ begin
     y := yPos;
 end;
 
-// Initialisation logic
-initialization
-    glfwSetErrorCallback(@glfw_error_callback);
-
-    if glfwInit = GLFW_FALSE then
-    begin
-        writeln('GLFW could not be initialized!');
-        halt(1);
-    end;
-
-    SetLength(windows, 1);
-    writeln('GLFW has been initialized successfully!');
 end.

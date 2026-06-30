@@ -5,7 +5,7 @@ unit dbFast3D;
 interface // Public
 
 uses
-    dbCore, dbCore3D, dbMath3D, dbTexture2D, sysutils, gl, glu, glext;
+    dbCore, dbCore3D, dbMath3D, dbTexture2D, sysutils, dglOpenGL;
 
 // Fast Mesh
 type TFastMesh = record
