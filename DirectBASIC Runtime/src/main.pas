@@ -6,11 +6,8 @@ uses
 var
     window:             TWindowHandle;
     shader:             TShaderHandle;
-    vao:                TVertexContainerHandle;
     aspectRatio:        single;
     w, h:               cardinal;
-
-    vertices:           array of GLfloat;
 
 procedure PrintInfo();
 begin
@@ -40,8 +37,8 @@ begin
     w := 800;
     h := 600;
 
-    window := CreateWindow(w, h, 'Title!', WCI_330);
-    MakeContextCurrent(window);
+    window := CreateWindow(w, h, 'Title!', WCI_COMPAT);
+    SetContextCurrent(window);
     Initialize3D;
 
     SetWindowResizable(window, true);
@@ -57,25 +54,9 @@ begin
     SetDepthFunc(0);
     SetCullFace(0);
 
-    SetLength(vertices, 9);
-    vertices[0] := -0.5;
-    vertices[1] := -0.5;
-    vertices[2] := -0.5;
+    shader := LoadShader('shaders/default.vert', 'shaders/default.frag');
 
-    vertices[3] := 0.0;
-    vertices[4] := 0.5;
-    vertices[5] := -0.5;
-
-    vertices[6] := 0.5;
-    vertices[7] := -0.5;
-    vertices[8] := -0.5;
-
-    shader := LoadShader('default.vert', 'default.frag');
-
-    vao := CreateVertexContainer;
-    AddBuffer(vao, 0, length(vertices) * sizeof(vertices), @vertices[0], 0);
-    writeln(length(vertices) * sizeof(vertices));
-    BuildVertexContainer(vao);
+    // Init stuff here
 
     SetClearColor(0.3, 0.6, 0.9, 1.0);
     SetViewport(0, 0, w, h);
@@ -94,7 +75,8 @@ begin
         end;
 
         BeginShader(shader);
-        DrawPrimitive(vao);
+        // Draw Here
+
         EndShader;
 
         HandleInput;
@@ -104,7 +86,6 @@ begin
         //sleep(16);
     end;
 
-    DeleteVertexContainer(vao);
     DeleteShader(shader);
 
     DestroyWindow(window);
