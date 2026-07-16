@@ -7,7 +7,7 @@
             "command": "cmd",
             "args": [
                 "/c",
-                "fpc src/main.pas -o\"./bin/x86/dbasic.exe\" -Fusrc/runtime/external -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics"
+                "fpc src/main.pas -o\"./bin/x86/dbasic.exe\" -Fusrc/runtime/external -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics -Fu./bin/include -Fo./bin/lib"
             ],
             "group": {
                 "kind": "build",
