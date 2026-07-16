@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build x86",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "fpc src/main.pas -o\"./bin/x86/dbasic.exe\" -Fusrc/runtime/external -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
