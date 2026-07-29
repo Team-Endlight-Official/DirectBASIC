@@ -12,5 +12,7 @@ begin
     writeln('Hello, DirectBASIC!');
     lexer := CreateLexer('codes/example.dib');
     Lex(lexer);
+
+    WriteTokens(lexer);
     readln;
 end.

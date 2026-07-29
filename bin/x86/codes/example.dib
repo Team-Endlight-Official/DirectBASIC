@@ -1,6 +1,8 @@
-Print "This is a text!"
-x = 100
-pi = 3.14
-ayo_what_the_fah = 197.67.2.255
+Print ("Hello, World!")
 
-Exp2 = GL_EXPONENTIAL
+; This is a one line comment!
+ReadKey ()
+
+; Jeste ne ted, delej, delej, delej
+; To je debil no tak to jsem nevidel
+; Svarta je ti neco?
