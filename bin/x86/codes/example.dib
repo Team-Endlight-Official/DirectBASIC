@@ -1,8 +1,12 @@
-Print ("Hello, World!")
+Function Hello() Begin
+    Print("Hello, World!")
+End
 
-; This is a one line comment!
-ReadKey ()
+i = 0
 
-; Jeste ne ted, delej, delej, delej
-; To je debil no tak to jsem nevidel
-; Svarta je ti neco?
+While i > 9 Do
+    Hello()
+    i = i + 1
+End
+
+ReadLn()

@@ -14,5 +14,6 @@ begin
     Lex(lexer);
 
     WriteTokens(lexer);
+
     readln;
 end.

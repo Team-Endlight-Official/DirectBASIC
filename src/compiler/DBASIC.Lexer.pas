@@ -4,7 +4,17 @@ unit DBASIC.Lexer;
 
 interface
 
-type TokenKind = (tkIdentifier, tkDigit, tkString, tkComment, tkLParen, tkRParen, tkComma, tkAssignmentOp, tkEOF);
+type TokenKind = (
+    tkIdentifier,
+    tkDigit,
+    tkString,
+    tkComment,
+    tkLParen, tkRParen,
+    tkComma,
+    tkAssignmentOp, tkPlusOp, tkMinusOp, tkMulOp, tkDivOp, tkGreaterOp, tkLessOp,
+    tkWhileKw, tkDoKw, tkEndKw, tkBeginKw, tkIfKw, tkThenKw, tkElseKw, tkFunctionKw, tkForKw,
+    tkEOF,
+    tkUnknown);
 
 type TToken = record
     kind:       TokenKind;
@@ -145,8 +155,10 @@ end;
 procedure ReadIdentifier(var lexer: TLexer);
 var
     identifier:         string;
+    kind:               TokenKind;
 begin
     identifier := '';
+    kind       := TokenKind.tkUnknown;
 
     while IsLetter(lexer) or IsDigit(lexer) do
     begin
@@ -154,8 +166,23 @@ begin
         Advance(lexer);
     end;
 
+    // Check Keyword
+
+    case identifier of
+        'Begin':    kind := TokenKind.tkBeginKw;
+        'End':      kind := TokenKind.tkEndKw;
+        'If':       kind := TokenKind.tkIfKw;
+        'Else':     kind := TokenKind.tkElseKw;
+        'Then':     kind := TokenKind.tkThenKw;
+        'Do':       kind := TokenKind.tkDoKw;
+        'While':    kind := TokenKind.tkWhileKw;
+        'Function': kind := TokenKind.tkFunctionKw;
+        'For':      kind := TokenKind.tkForKw;
+        else        kind := TokenKind.tkIdentifier;
+    end;
+
     //writeln('Identifier: ', identifier, ' [at line: ', GetCurrentLine(lexer), ', col: ', GetCurrentColumn(lexer), ']');
-    AddToken(lexer, TokenKind.tkIdentifier, identifier, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+    AddToken(lexer, kind, identifier, GetCurrentLine(lexer), GetCurrentColumn(lexer));
 end;
 
 procedure ReadNumber(var lexer: TLexer);
@@ -266,6 +293,24 @@ begin
     Advance(lexer);
 end;
 
+procedure ReadOperand(var lexer: TLexer);
+var
+    operand:            string;
+begin
+    operand := GetCurrentChar(lexer);
+    case operand of
+        '+': AddToken(lexer, TokenKind.tkPlusOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+        '-': AddToken(lexer, TokenKind.tkMinusOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+        '*': AddToken(lexer, TokenKind.tkMulOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+        '/': AddToken(lexer, TokenKind.tkDivOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+        '<': AddToken(lexer, TokenKind.tkLessOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+        '>': AddToken(lexer, TokenKind.tkGreaterOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+    end;
+
+
+    Advance(lexer);
+end;
+
 // / INTERNAL LEXER FUNCTIONS
 
 procedure Lex(var lexer: TLexer);
@@ -298,6 +343,10 @@ begin
         begin
             ReadComma(lexer);
         end
+        else if GetcurrentChar(lexer) in ['+', '-', '*', '/', '<', '>'] then
+        begin
+            ReadOperand(lexer);
+        end
         else if GetCurrentChar(lexer) = '=' then
         begin
             ReadAssigner(lexer);
@@ -312,13 +361,18 @@ begin
         end;
     end;
 
+    AddToken(lexer, TokenKind.tkEOF, '', GetCurrentLine(lexer), GetCurrentColumn(lexer));
+
     //writeln('[LEXICAL ANALYSIS ENDED]');
 end;
 
 procedure WriteTokens(var lexer: TLexer);
 var
     i:      integer;
+    count:  integer;
 begin
+    count := 0;
+
     if Length(lexer.tokens) < 1 then
     begin
         writeln('ERR: No tokens found in this lexer!');
@@ -328,7 +382,10 @@ begin
     for i := 0 to Length(lexer.tokens) - 1 do
     begin
         writeln('[KIND: ', lexer.tokens[i].kind, ', VALUE: "', lexer.tokens[i].value, '" , LINE: ', lexer.tokens[i].line, ', COLUMN: ', lexer.tokens[i].column, ']');
+        inc(count, 1);
     end;
+
+    writeln('Total tokens: ', count);
 end;
 
 end.
