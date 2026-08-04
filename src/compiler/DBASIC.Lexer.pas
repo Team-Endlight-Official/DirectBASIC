@@ -13,6 +13,7 @@ type TokenKind = (
     tkComma,
     tkAssignmentOp, tkPlusOp, tkMinusOp, tkMulOp, tkDivOp, tkGreaterOp, tkLessOp,
     tkWhileKw, tkDoKw, tkEndKw, tkBeginKw, tkIfKw, tkThenKw, tkElseKw, tkFunctionKw, tkForKw,
+    tkNewLine,
     tkEOF,
     tkUnknown);
 
@@ -321,6 +322,11 @@ begin
     begin
         if IsWhitespace(lexer) then
         begin
+            if GetCurrentChar(lexer) = #10 then
+            begin
+                AddToken(lexer, TokenKind.tkNewLine, '', GetCurrentLine(lexer), GetCurrentColumn(lexer))
+            end;
+
             Advance(lexer);
         end
         else if IsLetter(lexer) then
@@ -357,6 +363,7 @@ begin
         end
         else
         begin
+            AddToken(lexer, TokenKind.tkUnknown, GetCurrentChar(lexer), GetCurrentLine(lexer), GetCurrentColumn(lexer));
             Advance(lexer);
         end;
     end;

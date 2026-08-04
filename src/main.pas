@@ -4,16 +4,27 @@ program main;
 
 uses
     SysUtils,
-    DBASIC.Lexer;
+    DBASIC.Lexer,
+    DBASIC.Parser;
 
 var
     lexer:      TLexer;
+    parser:         TParser;
 begin
     writeln('Hello, DirectBASIC!');
-    lexer := CreateLexer('codes/example.dib');
-    Lex(lexer);
+    writeln('');
+    writeln('LEXER/TOKENIZER:');
+    writeln('');
 
+    lexer := CreateLexer('codes/example.dbx');
+    Lex(lexer);
     WriteTokens(lexer);
+
+    writeln('');
+    writeln('IR PARSER:');
+    writeln('');
+    parser := CreateParser(lexer);
+    Parse(parser);
 
     readln;
 end.
