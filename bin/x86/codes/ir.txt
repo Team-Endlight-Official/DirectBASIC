@@ -1,0 +1,19 @@
+CALL Print
+ARG "Hello, World!"
+ENDCALL
+STMTEND
+
+VAR x DIGIT
+SET x 5
+STMTEND
+
+VAR y STRING
+SET y "This is a text!"
+STMTEND
+
+CALL Print
+ARG y
+ENDCALL
+STMTEND
+
+

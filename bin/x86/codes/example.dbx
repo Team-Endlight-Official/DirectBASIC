@@ -1,4 +1,6 @@
 Print("Hello, World!")
-ReadLine()
 
-; A simple hello world program!
+x = 5
+y = "This is a text!"
+
+Print(y)

@@ -25,6 +25,9 @@ begin
     writeln('');
     parser := CreateParser(lexer);
     Parse(parser);
+    WriteIR(parser);
+
+    DumpIR(parser, 'codes/');
 
     readln;
 end.
