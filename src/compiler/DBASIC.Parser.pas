@@ -79,6 +79,11 @@ begin
             EmitIR(parser, 'ARG ' + token.value);
         end;
 
+        TokenKind.tkComma:
+        begin
+            EmitIR(parser, 'COMMA');
+        end;
+
         else
         begin
             writeln('Unknown argument token!');
@@ -88,11 +93,14 @@ begin
 
     NextToken(parser);
 
+    {
     // Skip comma
     if GetCurrentToken(parser).kind = TokenKind.tkComma then
     begin
+        EmitIR(parser, 'COMMA');
         NextToken(parser);
     end;
+    }
 end;
 
 procedure ParseFunctionCall(var parser: TParser; &name: string);
@@ -137,7 +145,8 @@ begin
     end;
 
     EmitIR(parser, 'VAR ' + &name + ' ' + &type);
-    EmitIR(parser, 'SET ' + &name + ' ' + assignedValue);
+    EmitIR(parser, 'SET ' + &name);
+    EmitIR(parser, assignedValue);
     EmitIR(parser, 'STMTEND');
     EmitIR(parser, '');
 

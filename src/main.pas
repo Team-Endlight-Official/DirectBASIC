@@ -9,7 +9,7 @@ uses
 
 var
     lexer:      TLexer;
-    parser:         TParser;
+    parser:     TParser;
 begin
     writeln('Hello, DirectBASIC!');
     writeln('');
@@ -28,6 +28,6 @@ begin
     WriteIR(parser);
 
     DumpIR(parser, 'codes/');
-
+    
     readln;
 end.

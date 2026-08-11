@@ -11,6 +11,7 @@ type TokenKind = (
     tkComment,
     tkLParen, tkRParen,
     tkComma,
+    tkAccessor,
     tkAssignmentOp, tkPlusOp, tkMinusOp, tkMulOp, tkDivOp, tkGreaterOp, tkLessOp,
     tkWhileKw, tkDoKw, tkEndKw, tkBeginKw, tkIfKw, tkThenKw, tkElseKw, tkFunctionKw, tkForKw,
     tkNewLine,
@@ -261,6 +262,22 @@ begin
     end;
 end;
 
+procedure ReadAccessor(var lexer: TLexer);
+var
+    accessor:              string;
+begin
+    accessor := '';
+
+    if GetCurrentChar(lexer) = ':' then
+    begin
+        accessor := GetCurrentChar(lexer);
+        Advance(lexer);
+
+        //writeln('Comma: "', comma, '" [at line: ', GetCurrentLine(lexer), ', col: ', GetCurrentColumn(lexer), ']');
+        AddToken(lexer, TokenKind.tkAccessor, accessor, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+    end;
+end;
+
 procedure ReadAssigner(var lexer: TLexer);
 var
     assign:             string;
@@ -345,11 +362,15 @@ begin
         begin
             ReadComment(lexer);
         end
+        else if GetCurrentChar(lexer) = ':' then
+        begin
+            ReadAccessor(lexer);
+        end
         else if GetCurrentChar(lexer) = ',' then
         begin
             ReadComma(lexer);
         end
-        else if GetcurrentChar(lexer) in ['+', '-', '*', '/', '<', '>'] then
+        else if GetCurrentChar(lexer) in ['+', '-', '*', '/', '<', '>'] then
         begin
             ReadOperand(lexer);
         end

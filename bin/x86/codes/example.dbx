@@ -1,6 +1,1 @@
-Print("Hello, World!")
-
-x = 5
-y = "This is a text!"
-
-Print(y)
+Print ("Hello, World!")
