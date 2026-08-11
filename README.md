@@ -4,6 +4,9 @@
 <img width="1579" height="900" alt="image" src="https://github.com/user-attachments/assets/89872d60-b960-49ff-8912-e9c2c87a95ce" />
 The parser kinda works now but it is very basic. Will make a better implementation for it sooner or later ;)
 After the parser with the symbol table etched is finished i will then make a CodeGen into Pascal sources :D
+Note 11/08/2026:
+Added some small new stuff and tinkered around with it.
+Forgor to mention i deleted fpGUI and now the project weight ~2MB instead of 27MB.
 
 ## Previous Progress
 <img width="1175" height="652" alt="image" src="https://github.com/user-attachments/assets/38b766d8-29de-49de-a754-f6b7de5bc978" />
