@@ -16,7 +16,7 @@ begin
     writeln('LEXER/TOKENIZER:');
     writeln('');
 
-    lexer := CreateLexer('codes/example.dbx');
+    lexer := CreateLexer('codes/example.bas');
     Lex(lexer);
     WriteTokens(lexer);
 
@@ -28,6 +28,7 @@ begin
     WriteIR(parser);
 
     DumpIR(parser, 'codes/');
+    
     
     readln;
 end.

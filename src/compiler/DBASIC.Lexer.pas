@@ -12,7 +12,7 @@ type TokenKind = (
     tkLParen, tkRParen,
     tkComma,
     tkAccessor,
-    tkAssignmentOp, tkPlusOp, tkMinusOp, tkMulOp, tkDivOp, tkGreaterOp, tkLessOp,
+    tkAssignmentOp, tkPlusOp, tkMinusOp, tkMulOp, tkDivOp, tkGreaterOp, tkLessOp, tkLessEquOp, tkGreaterEquOp,
     tkWhileKw, tkDoKw, tkEndKw, tkBeginKw, tkIfKw, tkThenKw, tkElseKw, tkFunctionKw, tkForKw,
     tkNewLine,
     tkEOF,
@@ -39,6 +39,8 @@ end;
 function CreateLexer(const sourcePath: string): TLexer;
 function GetCurrentChar(var lexer: TLexer): char;
 function GetCharAt(var lexer: TLexer; position: integer): char;
+function GetNextChar(var lexer: TLexer): char;
+function GetPrevChar(var lexer: TLexer): char;
 function GetCurrentPosition(var lexer: TLexer): integer;
 function GetCurrentLine(var lexer: TLexer): integer;
 function GetCurrentColumn(var lexer: TLexer): integer;
@@ -90,6 +92,16 @@ begin
         Result := #0
     else
         Result := lexer.source[position];
+end;
+
+function GetNextChar(var lexer: TLexer): char;
+begin
+    Result := GetCharAt(lexer, lexer.position + 1);
+end;
+
+function GetPrevChar(var lexer: TLexer): char;
+begin
+    Result := GetCharAt(lexer, lexer.position - 1);
 end;
 
 function GetCurrentPosition(var lexer: TLexer): integer;
@@ -321,8 +333,34 @@ begin
         '-': AddToken(lexer, TokenKind.tkMinusOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
         '*': AddToken(lexer, TokenKind.tkMulOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
         '/': AddToken(lexer, TokenKind.tkDivOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
-        '<': AddToken(lexer, TokenKind.tkLessOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
-        '>': AddToken(lexer, TokenKind.tkGreaterOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+
+        '<': 
+        begin
+            if (GetNextChar(lexer) = '=') then
+            begin
+                operand := operand + '=';
+                AddToken(lexer, TokenKind.tkLessEquOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+                Advance(lexer);
+            end
+            else
+            begin
+                AddToken(lexer, TokenKind.tkLessOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+            end;
+        end;
+
+        '>':
+        begin
+            if (GetNextChar(lexer) = '=') then
+            begin
+                operand := operand + '=';
+                AddToken(lexer, TokenKind.tkGreaterEquOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+                Advance(lexer);
+            end
+            else
+            begin
+                AddToken(lexer, TokenKind.tkGreaterOp, operand, GetCurrentLine(lexer), GetCurrentColumn(lexer));
+            end;
+        end;
     end;
 
 
@@ -339,7 +377,7 @@ begin
     begin
         if IsWhitespace(lexer) then
         begin
-            if GetCurrentChar(lexer) = #10 then
+            if GetCurrentChar(lexer) = #13 then
             begin
                 AddToken(lexer, TokenKind.tkNewLine, '', GetCurrentLine(lexer), GetCurrentColumn(lexer))
             end;

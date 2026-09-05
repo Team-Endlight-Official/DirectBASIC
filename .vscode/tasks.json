@@ -1,14 +1,34 @@
 {
     "version": "2.0.0",
     "tasks": [
+        // TASKS FOR WINDOWS 32 BIT!
         {
-            "label": "Build main x86",
+            "label": "Compile main win-x86",
             "type": "shell",
             "command": "cmd",
             "args": [
                 "/c",
-                "fpc src/main.pas -o\"./bin/x86/dbasic.exe\" -Fusrc/compiler -Fusrc/runtime/external -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics -Fu./bin/obj -Fo./bin/obj"
+                "fpc src/main.pas -o\"./bin/win-x86/dbasic.exe\" -Fusrc/compiler -Fusrc/runtime/external -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics "
             ],
+            "problemMatcher": []
+        },
+        {
+            "label": "fpcorg_mainx86",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "move /Y bin\\win-x86\\*.ppu bin\\obj\\ && move /Y bin\\win-x86\\*.o bin\\obj\\"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build main win-x86",
+            "dependsOn": [
+                "Compile main win-x86",
+                "fpcorg_mainx86"
+            ],
+            "dependsOrder": "sequence",
             "group": {
                 "kind": "build",
                 "isDefault": true

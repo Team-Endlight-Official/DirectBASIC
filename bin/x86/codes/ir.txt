@@ -1,6 +1,0 @@
-CALL Print
-ARG "Hello, World!"
-ENDCALL
-STMTEND
-
-

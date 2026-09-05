@@ -24,6 +24,9 @@ function GetCurrentToken(var parser: TParser): TToken;
 
 procedure Parse(var parser: TParser);
 
+procedure IncParenDepth(var parser: TParser; consume: boolean);
+procedure DecParenDepth(var parser: TParser; consume: boolean);
+
 procedure WriteIR(var parser: TParser);
 procedure DumpIR(var parser: TParser; path: string);
 
@@ -84,9 +87,41 @@ begin
             EmitIR(parser, 'COMMA');
         end;
 
+        TokenKind.tkDivOp:
+        begin
+            EmitIR(parser, 'OP_DIV');
+        end;
+
+        TokenKind.tkMulOp:
+        begin
+            EmitIR(parser, 'OP_MUL');
+        end;
+
+        TokenKind.tkPlusOp:
+        begin
+            EmitIR(parser, 'OP_PLUS');
+        end;
+
+        TokenKind.tkMinusOp:
+        begin
+            EmitIR(parser, 'OP_MINUS');
+        end;
+
+        TokenKind.tkLParen:
+        begin
+            IncParenDepth(parser, false);
+            EmitIR(parser, 'PAREN_OPEN');
+        end;
+
+        TokenKind.tkRParen:
+        begin
+            DecParenDepth(parser, false);
+            EmitIR(parser, 'PAREN_CLOSE');
+        end;
+
         else
         begin
-            writeln('Unknown argument token!');
+            writeln('Unknown argument token! ', GetCurrentToken(parser).kind);
             exit;
         end;
     end;
@@ -105,16 +140,16 @@ end;
 
 procedure ParseFunctionCall(var parser: TParser; &name: string);
 begin
-    NextToken(parser); // Consume (
+    IncParenDepth(parser, true); // Consume (
 
     EmitIR(parser, 'CALL ' + &name);
 
-    while GetCurrentToken(parser).kind <> TokenKind.tkRParen do
+    while (GetCurrentToken(parser).kind <> TokenKind.tkRParen) and (parser.parenthesisDepth < 2) do
     begin
         ParseFunctionArguments(parser);
     end;
 
-    NextToken(parser); // Consume )
+    DecParenDepth(parser, true); // Consume )
     EmitIR(parser, 'ENDCALL');
     EmitIR(parser, 'STMTEND');
     EmitIR(parser, '');
@@ -174,7 +209,7 @@ begin
         TokenKind.tkNewLine:            NextToken(parser);
         else
         begin
-            writeln('Unknown token!');
+            writeln('Unknown token! ', GetCurrentToken(parser).kind);
             NextToken(parser);
             exit;
         end;
@@ -187,14 +222,14 @@ begin
     begin
         if GetCurrentToken(parser).kind = TokenKind.tkLParen then
         begin
-            inc(parser.parenthesisDepth, 1);
-            //writeln('PARENTHESIS DEPTH: ', parser.parenthesisDepth);
-            NextToken(parser);
+            IncParenDepth(parser, true);
         end
         else if GetCurrentToken(parser).kind = TokenKind.tkRParen then
         begin
-            dec(parser.parenthesisDepth, 1);
-            //writeln('PARENTHESIS DEPTH: ', parser.parenthesisDepth);
+            DecParenDepth(parser, true);
+        end
+        else if GetCurrentToken(parser).kind = TokenKind.tkComment then
+        begin
             NextToken(parser);
         end
         else
@@ -202,6 +237,22 @@ begin
             ParseStatement(parser);
         end;
     end;
+end;
+
+procedure IncParenDepth(var parser: TParser; consume: boolean);
+begin
+    inc(parser.parenthesisDepth);
+    writeln('PARENTHESIS DEPTH: ', parser.parenthesisDepth);
+    if consume then NextToken(parser); // Consume (
+end;
+
+procedure DecParenDepth(var parser: TParser; consume: boolean);
+begin
+    dec(parser.parenthesisDepth);
+    if (parser.parenthesisDepth < 0) then parser.parenthesisDepth := 0;
+
+    writeln('PARENTHESIS DEPTH: ', parser.parenthesisDepth);
+    if consume then NextToken(parser); // Consume )
 end;
 
 procedure WriteIR(var parser: TParser);
