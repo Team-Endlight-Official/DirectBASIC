@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="DirectBASIC Debug Console" package="com.endlight.dbasdebugconsole" version="0.0.1" company="Endlight" />
+	<app main="Main" path="Export" file="dbasconsole" />
+	<window resizable="false" width="600" height="424" borderless="true"/>
+	
+	<source path="Source" />
+	
+	<haxelib name="openfl" />
+	
+	<assets path="Assets" rename="assets" />
+	
+</project>
