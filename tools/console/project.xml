@@ -2,8 +2,8 @@
 <project>
 	
 	<meta title="DirectBASIC Debug Console" package="com.endlight.dbasdebugconsole" version="0.0.1" company="Endlight" />
-	<app main="Main" path="Export" file="dbasconsole" />
-	<window resizable="false" width="600" height="424" borderless="true"/>
+	<app main="Main" path="Export" file="dbconsole" />
+	<window resizable="false" width="600" height="400"/>
 	
 	<source path="Source" />
 	

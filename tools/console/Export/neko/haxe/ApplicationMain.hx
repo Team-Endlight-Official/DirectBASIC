@@ -16,11 +16,11 @@ class ApplicationMain
 	#if !macro
 	public static function main()
 	{
-		lime.system.System.__registerEntryPoint("dbasconsole", create);
+		lime.system.System.__registerEntryPoint("dbconsole", create);
 
 		#if (js && html5)
 		#if (munit || (utest && openfl_enable_utest_legacy_mode))
-		lime.system.System.embed("dbasconsole", null, 600, 424);
+		lime.system.System.embed("dbconsole", null, 600, 400);
 		#end
 		#else
 		create(null);
@@ -35,9 +35,9 @@ class ApplicationMain
 		ManifestResources.init(config);
 		#end
 
-		app.meta["build"] = "38";
+		app.meta["build"] = "39";
 		app.meta["company"] = "Endlight";
-		app.meta["file"] = "dbasconsole";
+		app.meta["file"] = "dbconsole";
 		app.meta["name"] = "DirectBASIC Debug Console";
 		app.meta["packageName"] = "com.endlight.dbasdebugconsole";
 		app.meta["version"] = "0.0.1";
@@ -49,12 +49,12 @@ class ApplicationMain
 		var attributes:lime.ui.WindowAttributes = {
 			allowHighDPI: false,
 			alwaysOnTop: false,
-			borderless: true,
+			borderless: false,
 			// display: 0,
 			element: null,
 			frameRate: 30,
 			#if !web fullscreen: false, #end
-			height: 424,
+			height: 400,
 			hidden: #if munit true #else false #end,
 			maximized: false,
 			minimized: false,

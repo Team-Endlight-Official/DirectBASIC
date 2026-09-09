@@ -1,7 +1,5 @@
 package;
 
-import openfl.text.TextFormat;
-import openfl.text.TextField;
 import openfl.display.Sprite;
 
 class Main extends Sprite
@@ -14,47 +12,32 @@ class Main extends Sprite
 
 	private function build()
 	{
-		this.graphics.beginFill(0x202020);
-		this.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
-		this.graphics.endFill();
+		// Paint the background
+		graphics.beginFill(0x2F2F2F);
+		graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+		graphics.endFill();
 
-		buildTitleBar();
-		buildStatusBar();
-	}
+		// Add the statusbar
+		var statusbar = new Statusbar();
+		addChild(statusbar);
+		statusbar.draw();
+		statusbar.y = stage.stageHeight - statusbar.getBarHeight();
+		
+		var menubar = new Statusbar(20);
+		addChild(menubar);
+		menubar.draw();
 
-	private function buildTitleBar()
-	{
-		this.graphics.beginFill(0x303030);
-		this.graphics.drawRect(0, 0, stage.stageWidth, 24);
-		this.graphics.endFill();
+		// Add Button
+		var compileButton = new Button(64, 20, "Compile");
+		addChild(compileButton);
+		compileButton.draw();
+		compileButton.x = stage.stageWidth - 110;
+		compileButton.y = stage.stageHeight - 62;
 
-		this.graphics.lineStyle(1, 0xFFFFFF, 0.45);
-		this.graphics.drawRect(0, 0, stage.stageWidth, 24);
-		this.graphics.lineStyle();
-
-		var title = new TextField();
-		title.text = "DirectBASIC Debug Console";
-		title.x = 1;
-		title.y = 3;
-		title.width = 256;
-		title.height = 32;
-		title.selectable = false;
-
-		var titleformat = new TextFormat();
-		titleformat.bold = false;
-		titleformat.color = 0xFAFAFA;
-		titleformat.kerning = true;
-		titleformat.size = 14;
-		titleformat.font = "Arial";
-
-		title.defaultTextFormat = titleformat;
-		addChild(title);
-	}
-
-	private function buildStatusBar()
-	{
-		this.graphics.beginFill(0x323232);
-		this.graphics.drawRect(2.5, stage.stageHeight - (20 + 2.5), stage.stageWidth - 5, 20);
-		this.graphics.endFill();
+		var buildButton = new Button(64, 20, "Build");
+		addChild(buildButton);
+		buildButton.draw();
+		buildButton.x = stage.stageWidth - 180;
+		buildButton.y = stage.stageHeight - 62;
 	}
 }
