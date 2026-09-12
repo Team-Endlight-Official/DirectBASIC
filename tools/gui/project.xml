@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="GUI Toolkit Showcase" package="com.endlight.guitk" version="1.0.0" company="Endlight" />
+	<app main="Main" path="Export" file="guitk_example" />
+	<window width="1280" height="720"/>
+	
+	<source path="Source" />
+	
+	<haxelib name="openfl" />
+	
+	<assets path="Assets" rename="assets" />
+	
+</project>
