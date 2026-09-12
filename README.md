@@ -1,14 +1,13 @@
 # DirectBASIC
+DirectBASIC is a small, old-school BASIC-inspired game-development SDK with its own compiler, runtime, IDE tools, debugger, and shader utilities. It is designed around simplicity, explicit control, and a compact developer workflow.
 
 ## Current Progress
-<img width="1579" height="900" alt="image" src="https://github.com/user-attachments/assets/89872d60-b960-49ff-8912-e9c2c87a95ce" />
-The parser kinda works now but it is very basic. Will make a better implementation for it sooner or later ;)
-After the parser with the symbol table etched is finished i will then make a CodeGen into Pascal sources :D
-Note 11/08/2026:
-Added some small new stuff and tinkered around with it.
-Forgor to mention i deleted fpGUI and now the project weight ~2MB instead of 27MB.
+<img width="703" height="486" alt="image" src="https://github.com/user-attachments/assets/bfe7dc0a-d28e-41b5-87a3-5fb5a280b322" />
+I was on a small hiatus, but i am back now :D
+I started to work on the GUI facade of DirectBASIC tools and utilities. Here is a small rendering demo of the DirectBASIC Analytics/Console thingy :D
 
 ## Previous Progress
+<img width="1579" height="900" alt="image" src="https://github.com/user-attachments/assets/89872d60-b960-49ff-8912-e9c2c87a95ce" />
 <img width="1175" height="652" alt="image" src="https://github.com/user-attachments/assets/38b766d8-29de-49de-a754-f6b7de5bc978" />
 <img width="884" height="673" alt="image" src="https://github.com/user-attachments/assets/a9bf383f-181b-4bc3-bee1-80e2605f090f" />
 <img width="1036" height="734" alt="image" src="https://github.com/user-attachments/assets/b3debb4a-a6ee-4dc2-8f0b-b2c6314bb526" />
