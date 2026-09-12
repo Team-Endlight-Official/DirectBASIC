@@ -1,4 +1,5 @@
 # DirectBASIC
+DirectBASIC is a small, old-school BASIC-inspired game-development SDK with its own compiler, runtime, IDE tools, debugger, and shader utilities. It is designed around simplicity, explicit control, and a compact developer workflow.
 
 ## Current Progress
 <img width="703" height="486" alt="image" src="https://github.com/user-attachments/assets/bfe7dc0a-d28e-41b5-87a3-5fb5a280b322" />
