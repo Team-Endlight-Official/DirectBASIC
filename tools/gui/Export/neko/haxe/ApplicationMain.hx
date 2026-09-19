@@ -35,7 +35,7 @@ class ApplicationMain
 		ManifestResources.init(config);
 		#end
 
-		app.meta["build"] = "40";
+		app.meta["build"] = "44";
 		app.meta["company"] = "Endlight";
 		app.meta["file"] = "guitk_example";
 		app.meta["name"] = "GUI Toolkit Showcase";

@@ -1,5 +1,7 @@
 package guitk;
 
+import openfl.text.TextFormat;
+
 /**
  * Base class for the color scheme of the GUI.
  */
@@ -34,10 +36,17 @@ class GUIStyle
     public var COLOR_WARN:Int = 0xD0A052;
     public var COLOR_SUCCESS:Int = 0xA8B86B;
 
+    public var TEXT_FORMAT_DEFAULT:TextFormat = null;
+
     /**
      * Specifies a new GUI style for the GUI
      */
-    public function new() {}
+    public function new()
+    {
+        TEXT_FORMAT_DEFAULT = new TextFormat();
+        TEXT_FORMAT_DEFAULT.font = "Lucida Grande";
+        TEXT_FORMAT_DEFAULT.color = COLOR_TEXT;
+    }
 
     /**
      * Returns the default GUI style that has the "Charcoal Caramel" theme.

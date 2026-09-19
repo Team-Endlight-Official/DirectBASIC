@@ -8,7 +8,7 @@
             "command": "cmd",
             "args": [
                 "/c",
-                "fpc src/main.pas -o\"./bin/win-x86/dbasic.exe\" -Fusrc/compiler -Fusrc/runtime/external -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics "
+                "fpc src/main.pas -o\"./bin/win-x86/directbasic.exe\" -Fusrc/compiler -Fusrc/runtime/external -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics "
             ],
             "problemMatcher": []
         },

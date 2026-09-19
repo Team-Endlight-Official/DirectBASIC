@@ -7,28 +7,78 @@ uses
     DBASIC.Lexer,
     DBASIC.Parser;
 
+const
+    VERSION = '0.1.1';
+
+function readStdin: string;
 var
+    line: string;
+begin
+    Result := '';
+
+    while not EOF(Input) do
+    begin
+        readln(line);
+
+        if Result <> '' then
+        begin
+            Result := Result + LineEnding;
+        end;
+
+        Result := Result + line;
+    end;
+end;
+
+procedure tokenize();
+var
+    param: string;
+    lexer: TLexer;
+begin
+    param := readStdin;
+
+    lexer := CreateLexer(param);
+    Lex(lexer);
+    
+    writeln(GetTokensJSON(lexer));
+end;
+
+var
+    // Compiler test
     lexer:      TLexer;
     parser:     TParser;
+
+    // CLI Controls
+    command:    string;
 begin
-    writeln('Hello, DirectBASIC!');
-    writeln('');
-    writeln('LEXER/TOKENIZER:');
-    writeln('');
+    if ParamCount = 0 then
+    begin
+        writeln('DirectBASIC Compiler CLI v', VERSION);
+        writeln('Write "directbasic help" to list all available commands.');
+        writeln;
+        writeln('Endlight 2024-2026');
 
-    lexer := CreateLexer('codes/example.bas');
-    Lex(lexer);
-    WriteTokens(lexer);
+        halt(1);
+    end;
 
-    writeln('');
-    writeln('IR PARSER:');
-    writeln('');
-    parser := CreateParser(lexer);
-    Parse(parser);
-    WriteIR(parser);
+    // command parsing
+    command := LowerCase(ParamStr(1));
 
-    DumpIR(parser, 'codes/');
-    
-    
-    readln;
+    case command of
+        'help':
+        begin
+            writeln('DirectBASIC available commands: ');
+            writeln('build {file.bas} -- Compiles and Builds the specified file into either an executable or a library.');
+            writeln('tokenize {string} -- Tokenizes the specified string and outputs a JSON representation of all the tokens.');
+        end;
+        'tokenize':
+        begin
+            tokenize;
+        end;
+
+        else
+        begin 
+            writeln('Unknown command, ', ParamStr(1));
+            halt(1);
+        end;
+    end;
 end.

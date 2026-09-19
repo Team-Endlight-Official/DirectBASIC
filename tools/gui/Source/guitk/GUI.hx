@@ -13,50 +13,15 @@ class GUI extends Sprite
     public function setBackground(color:Int)
     {
         stage.color = color;
-        //onRedraw();
     }
 
-    public function onResize(event:Event):Void
+    public function setMinimumWindowSize(width:Int, height:Int)
     {
-        if (numChildren < 1) return;
-
-        for (i in 0...numChildren)
-        {
-            var child = getChildAt(i);
-            if (child is GUIElement)
-            {
-                var element:GUIElement = cast child;
-                element.onResize(event);
-            }
-            else return;
-        }
-
-        trace("Resized!");
-
-        onRedraw();
+        stage.window.setMinSize(width, height);
     }
 
-    public function onRedraw():Void
+    public function setMaximumWindowSize(width:Int, height:Int)
     {
-        if (numChildren < 1) return;
-
-        for (i in 0...numChildren)
-        {
-            var child = getChildAt(i);
-            if (child is GUIElement)
-            {
-                var element:GUIElement = cast child;
-                element.onRedraw();
-            }
-            else return;
-        }
-
-        trace("Redrawn!");
-    }
-
-    public function add(element:GUIElement)
-    {
-        element.style = style;
-        addChild(element);
+        stage.window.setMaxSize(width, height);
     }
 }
