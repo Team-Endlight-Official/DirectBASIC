@@ -1,0 +1,34 @@
+<vbox width="100%" height="100%" style="padding: 0px; background-color: #191A19;">
+    <style>
+        .button {
+            width: 96px;
+            height: 20px;
+            font-size: 10px;
+            color: #DED8CC;
+            background-color: #3B352C;
+            background-color-end: #292722;
+            background-gradient-style: vertical;
+            border-color: #111211;
+            border-size: 1px;
+            border-radius: 10px;
+        }
+
+        #mainMenu {
+            background-color: #302D27;
+            background-color-end: #22221F;
+            background-gradient-style: vertical;
+            border-bottom-size: 0px;
+            border-bottom-radius: 0px;
+            border-bottom-color: #111211;
+        }
+    </style>
+
+    <menubar id="mainMenu" width="100%" height="28">
+    </menubar>
+
+    <hbox width="100%" height="100%">
+        <button text="Compile" id="button1" />
+        <button text="Run" id="button2" />
+        <button text="Cancel" id="button3" />
+    </hbox>    
+</vbox>
