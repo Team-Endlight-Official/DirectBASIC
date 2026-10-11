@@ -1,0 +1,40 @@
+ISRCBEGIN
+        Print
+        "Hello, World!"
+        STMTEND
+        
+        x
+        OP_ASS
+        2
+        STMTEND
+        
+        y
+        OP_ASS
+        4
+        STMTEND
+        
+        z
+        OP_ASS
+        x
+        OP_PLUS
+        y
+        STMTEND
+        
+        str
+        OP_ASS
+        "Hello"
+        STMTEND
+        
+        Print
+        str
+        STMTEND
+        
+        ReadLn
+        STMTEND
+        
+        Halt
+        0
+        STMTEND
+        
+ISRCEND
+

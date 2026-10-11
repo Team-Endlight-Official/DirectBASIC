@@ -79,16 +79,7 @@ begin
     Result.tokenCount := 0;
     Result.tokens :=     nil;
 
-    // Check whether the source is a file path
-    if (IsFileExtension(source, '.bas')) and (DoesFileExist(source)) then
-    begin
-        Result.source := ReadFile(source);
-    end
-    else
-    begin
-        Result.source := source;
-    end;
-    
+    Result.source := source;
     writeln('Lexer has been created!');
 end;
 
