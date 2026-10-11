@@ -2,10 +2,11 @@
 DirectBASIC is a small, old-school BASIC-inspired game-development SDK with its own compiler, runtime, IDE tools, debugger, and shader utilities. It is designed around simplicity, explicit control, and a compact developer workflow.
 
 ## Current Progress
-<img width="647" height="397" alt="image" src="https://github.com/user-attachments/assets/565bd2b9-1b0e-4060-a4cc-87c5409351c6" />
-Working on my own GUI solution called "GUItk".
+<img width="808" height="511" alt="image" src="https://github.com/user-attachments/assets/74360a8b-d024-4cc9-93e8-8ee24a1b9fe7" />
+Scrapped other GUI options and went for WPF and C#. Altho Windows only - it will work great. I will try to create a cross platform solution in the future.
 
 ## Previous Progress
+<img width="647" height="397" alt="image" src="https://github.com/user-attachments/assets/565bd2b9-1b0e-4060-a4cc-87c5409351c6" />
 <img width="614" height="455" alt="image" src="https://github.com/user-attachments/assets/78a952d0-9e32-4d9c-8401-116c0cbc2440" />
 <img width="703" height="486" alt="image" src="https://github.com/user-attachments/assets/bfe7dc0a-d28e-41b5-87a3-5fb5a280b322" />
 <img width="1579" height="900" alt="image" src="https://github.com/user-attachments/assets/89872d60-b960-49ff-8912-e9c2c87a95ce" />
