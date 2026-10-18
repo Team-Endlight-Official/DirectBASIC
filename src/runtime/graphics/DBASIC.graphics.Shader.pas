@@ -83,6 +83,7 @@ begin
         glGetShaderInfoLog(fid, 512, nil, @infoLog[0]);
         writeln('Error: Fragment Shader compilation failed: ', string(infoLog));
         glDeleteShader(fid);
+        glDeleteShader(vid);
         exit;
     end;
 
@@ -100,6 +101,8 @@ begin
         glGetProgramInfoLog(output.handle, 512, nil, @infoLog[0]);
         writeln('Error: Shader linking failed: ', string(infoLog));
         glDeleteProgram(output.handle);
+        glDeleteShader(vid);
+        glDeleteShader(fid);
         exit;
     end;
 

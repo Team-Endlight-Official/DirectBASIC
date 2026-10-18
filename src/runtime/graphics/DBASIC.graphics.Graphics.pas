@@ -28,7 +28,7 @@ begin
     4: cap := GL_STENCIL_TEST;
     else
         writeln('Error: Invalid capability index: ', cap, '. Reverting to DEPTH_TEST.');
-        cap := 0;
+        cap := GL_DEPTH_TEST;
     end;
 end;
 

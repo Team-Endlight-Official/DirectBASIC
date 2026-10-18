@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         // TASKS FOR WINDOWS 32 BIT!
-        {
+        { // Main 
             "label": "Compile main win-x86",
             "type": "shell",
             "command": "cmd",
@@ -12,8 +12,18 @@
             ],
             "problemMatcher": []
         },
+        { // Test program
+            "label": "Compile test win-x86",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "fpc src/test.pas -o\"./bin/win-x86/dbtest.exe\" -Fusrc/compiler -Fuexternal -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics "
+            ],
+            "problemMatcher": []
+        },
         {
-            "label": "fpcorg_mainx86",
+            "label": "fpcorg_x86",
             "type": "shell",
             "command": "cmd",
             "args": [
@@ -26,7 +36,20 @@
             "label": "Build main win-x86",
             "dependsOn": [
                 "Compile main win-x86",
-                "fpcorg_mainx86"
+                "fpcorg_x86"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build test win-x86",
+            "dependsOn": [
+                "Compile test win-x86",
+                "fpcorg_x86"
             ],
             "dependsOrder": "sequence",
             "group": {
