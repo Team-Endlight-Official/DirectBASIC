@@ -17,6 +17,9 @@ procedure DestroyWindow();
 function WindowShouldClose(): boolean;
 function DoesWindowExist(): boolean;
 
+function GetWindowWidth(): cardinal;
+function GetWindowHeight(): cardinal;
+
 implementation
 
 uses
@@ -137,6 +140,28 @@ begin
     end;
 
     glfwSwapBuffers(window);
+end;
+
+function GetWindowWidth(): cardinal;
+var
+    width: integer;
+    height: integer;
+begin
+    if not DoesWindowExist() then Result := 0;
+
+    glfwGetWindowSize(window, width, height);
+    Result := width;
+end;
+
+function GetWindowHeight(): cardinal;
+var
+    width: integer;
+    height: integer;
+begin
+    if not DoesWindowExist() then Result := 0;
+
+    glfwGetWindowSize(window, width, height);
+    Result := height;
 end;
 
 end.

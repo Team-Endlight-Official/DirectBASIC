@@ -17,10 +17,10 @@ end;
 
 // Public
 function LoadShader(vpath, fpath: string): TShader;
-procedure BeginShader(shader: TShader);
+procedure BeginShader(var shader: TShader);
 procedure EndShader();
-procedure DestroyShader(shader: TShader);
-function IsShaderValid(shader: TShader): boolean;
+procedure DestroyShader(var shader: TShader);
+function IsShaderValid(var shader: TShader): boolean;
 
 implementation
 
@@ -114,7 +114,7 @@ begin
 end;
 
 
-procedure BeginShader(shader: TShader);
+procedure BeginShader(var shader: TShader);
 begin
     if not IsShaderValid(shader) then
     begin
@@ -130,7 +130,7 @@ begin
     glUseProgram(0);
 end;
 
-procedure DestroyShader(shader: TShader);
+procedure DestroyShader(var shader: TShader);
 begin
     if not IsShaderValid(shader) then
     begin
@@ -142,7 +142,7 @@ begin
     writeln('Shader has been deleted!');
 end;
 
-function IsShaderValid(shader: TShader): boolean;
+function IsShaderValid(var shader: TShader): boolean;
 begin
     Result := shader.handle <> 0;
 end;

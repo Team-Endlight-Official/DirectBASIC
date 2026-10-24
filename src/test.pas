@@ -1,32 +1,70 @@
 program test;
 
 {$mode objfpc}{$H+}
-{$APPTYPE GUI}
 
 uses
     SysUtils,
-    DBASIC.core.Console;
+    DBASIC.core.Console,
+    DBASIC.&platform.Windowing,
+    DBASIC.graphics.Graphics,
+    DBASIC.graphics.Shader,
+    DBASIC.graphics.VertexArray,
+    DBASIC.graphics.VertexBuffer,
+    dglOpenGL;
 
+const
+    verticesData: array[0..8] of single = (-0.5, -0.5, 0.0,
+                                            0.0, 0.5, 0.0,
+                                            0.5, -0.5, 0.0);
+
+var
+    vao: TVertexArray;
+    vbo: TVertexBuffer;
+    shader: TShader;
 begin
-    BeginConsole('WOW', 800, 600);
-    ConsolePrintLn('Hello, Console!');
-    ConsolePrintLn('ERROR: You idiot!');
-    ConsolePrintLn('WARN: Ehm... actually..!');
-    ConsolePrintLn('INFO: just so you know.. this is actually insane');
-    ConsolePrintLn('Here we go again!');
+    CreateWindow(800, 600, 'Winduh!');
 
-    ConsolePrintLn('');
-    ConsolePrintLn('App Information: ');
-    ConsolePrintLn('Width: 800');
-    ConsolePrintLn('Height: 600');
-    ConsolePrintLn('OpenGL Version: 3.3.0 CORE');
-    ConsolePrintLn('Windowing Backend: GLFW');
+    shader := LoadShader('shaders/default.vert', 'shaders/default.frag');
 
-    while IsConsoleOpen do 
+    vao := CreateVertexArray();
+    BeginVertexArray(vao);
+
+    vbo := CreateVertexBuffer(GL_ARRAY_BUFFER);
+    BeginVertexBuffer(vbo);
+
+    glBufferData(vbo.btype, length(verticesData) * sizeof(single), @verticesData, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(single), nil);
+    glEnableVertexAttribArray(0);
+
+    EndVertexBuffer(vbo);
+
+    EndVertexArray();
+
+    SetViewport(0, 0, GetWindowWidth(), GetWindowHeight());
+    SetClearColor(0.3, 0.6, 0.9, 1.0);
+
+    while not WindowShouldClose() do
     begin
-        ConsolePump;
-        Sleep(16);
-    end;
+        SetClearMask(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
+        Enable(0);
 
-    EndConsole();
+        // One whole draw call!
+        BeginShader(shader);
+        BeginVertexArray(vao);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDisableVertexAttribArray(0);
+        EndVertexArray();
+        EndShader();
+
+        PollEvents();
+        SwapBuffers();
+    end;
+    DestroyVertexBuffer(vbo);
+    DestroyVertexArray(vao);
+    DestroyShader(shader);
+
+    DestroyWindow();
+
+    readln;
 end.
