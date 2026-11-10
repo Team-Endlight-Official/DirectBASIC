@@ -2,10 +2,11 @@
 A small, portable, interpreted language for making playable 2D and 3D games.
 
 ## Current Progress
-<img width="1920" height="1040" alt="image" src="https://github.com/user-attachments/assets/601d3a82-7823-476a-9fd4-b4d68c11fb92" />
-Implemented my own truly custom console window for my VM and runtime. It uses the raw Win32 API in Pascal. Might reconsider it since MSEgui or fpGUI is still an option. Just wait for it an see :D
+<img width="1227" height="644" alt="image" src="https://github.com/user-attachments/assets/8a8442f1-08c2-4388-95d8-52af80a47dfb" />
+Implemented my own .ini file reader in procedural paradigm as it will be accessible in the runtime and used internally too :D
 
 ## Previous Progress
+<img width="1920" height="1040" alt="image" src="https://github.com/user-attachments/assets/601d3a82-7823-476a-9fd4-b4d68c11fb92" />
 <img width="808" height="511" alt="image" src="https://github.com/user-attachments/assets/74360a8b-d024-4cc9-93e8-8ee24a1b9fe7" />
 <img width="647" height="397" alt="image" src="https://github.com/user-attachments/assets/565bd2b9-1b0e-4060-a4cc-87c5409351c6" />
 <img width="614" height="455" alt="image" src="https://github.com/user-attachments/assets/78a952d0-9e32-4d9c-8401-116c0cbc2440" />
