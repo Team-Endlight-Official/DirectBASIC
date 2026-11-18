@@ -8,7 +8,7 @@
             "command": "cmd",
             "args": [
                 "/c",
-                "fpc src/main.pas -o\"./bin/win-x86/directbasic.exe\" -Fusrc/compiler -Fuexternal -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics "
+                "fpc src/main.pas -o\"./bin/win-x86/directbasic.exe\" -Fusrc/vm -Fuexternal -Fusrc/rtl "
             ],
             "problemMatcher": []
         },
@@ -18,11 +18,21 @@
             "command": "cmd",
             "args": [
                 "/c",
-                "fpc src/test.pas -o\"./bin/win-x86/dbtest.exe\" -Fusrc/compiler -Fuexternal -Fusrc/runtime/core -Fusrc/runtime/platform -Fusrc/runtime/graphics "
+                "fpc src/test.pas -o\"./bin/win-x86/dbtest.exe\" -Fusrc/vm -Fuexternal -Fusrc/rtl "
             ],
             "problemMatcher": []
         },
-        {
+        { // Editor program
+            "label": "Compile edit win-x86",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "fpc src/edit.pas -o\"./bin/win-x86/dbedit.exe\" -Fusrc/vm -Fuexternal -Fuexternal/sdl2 -Fiexternal/sdl2 -Fusrc/rtl -Fusrc/edit "
+            ],
+            "problemMatcher": []
+        },
+        { // ORGANIZE UNITS AND MOVE .PPU AND .O FILES INTO OBJ FOLDER (32-BIT)
             "label": "fpcorg_x86",
             "type": "shell",
             "command": "cmd",
@@ -49,6 +59,19 @@
             "label": "Build test win-x86",
             "dependsOn": [
                 "Compile test win-x86",
+                "fpcorg_x86"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build edit win-x86",
+            "dependsOn": [
+                "Compile edit win-x86",
                 "fpcorg_x86"
             ],
             "dependsOrder": "sequence",
