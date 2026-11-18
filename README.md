@@ -2,10 +2,11 @@
 A small, portable, interpreted language for making playable 2D and 3D games.
 
 ## Current Progress
-<img width="1227" height="644" alt="image" src="https://github.com/user-attachments/assets/8a8442f1-08c2-4388-95d8-52af80a47dfb" />
-Implemented my own .ini file reader in procedural paradigm as it will be accessible in the runtime and used internally too :D
+<img width="1920" height="954" alt="image" src="https://github.com/user-attachments/assets/3e57ce0d-8998-4a05-a2b5-9707db6e464e" />
+Completely restructured the project and started experimenting with SDL2 for the Editor side of DirectBASIC.
 
 ## Previous Progress
+<img width="1227" height="644" alt="image" src="https://github.com/user-attachments/assets/8a8442f1-08c2-4388-95d8-52af80a47dfb" />
 <img width="1920" height="1040" alt="image" src="https://github.com/user-attachments/assets/601d3a82-7823-476a-9fd4-b4d68c11fb92" />
 <img width="808" height="511" alt="image" src="https://github.com/user-attachments/assets/74360a8b-d024-4cc9-93e8-8ee24a1b9fe7" />
 <img width="647" height="397" alt="image" src="https://github.com/user-attachments/assets/565bd2b9-1b0e-4060-a4cc-87c5409351c6" />
